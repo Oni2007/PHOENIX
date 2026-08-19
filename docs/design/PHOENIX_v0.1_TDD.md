@@ -858,6 +858,13 @@ cuBLAS / cuBLASLt                        ← trusted vendor implementation
 PHOENIX kernels GEMM-1..7
 ```
 
+**CPU-side counterpart (ADR-036).** Before any GPU exists, `gemm_blas_fp64`/`fp32`
+(`cpu/gemm_blas.cpp`, wrapping CBLAS) plays the same cross-checking role that
+cuBLAS plays once CUDA arrives — an externally-maintained implementation the
+naive/blocked/OpenMP kernels are checked against, gated on `blas_available()`
+since this development host has no root. CI installs `libopenblas-dev` and
+exercises it for real. See `docs/adr/ADR-036-blas-cross-check.md`.
+
 The CPU reference computes in **FP64 regardless of the tested dtype**, then compares. This gives a dtype-independent notion of "the right answer" and separates *implementation error* from *precision-induced error* — which are constantly conflated in accelerator work.
 
 ### 14.2 Tolerance policy
@@ -1757,6 +1764,7 @@ Four distinct lines/points, **visually distinguished by provenance class**:
 | ADR-033 | Project interpreter pinned by `uv` independently of the system Python | Accepted | System Python in WSL2 is 3.14.4, above §5's tested range; pinning decouples the project from distro drift | §5's tested range is extended after validation |
 | ADR-034 | GEMM correctness scales error by `(\|A\|·\|B\|)`, not `\|C\|`; `C` unchanged | Accepted | Dividing by `\|C\|` measures cancellation in the input data, not implementation error; found by EXP-001's first execution | Mixed-precision accumulate paths (EXP-006) |
 | ADR-035 | Working tree on a cloud-synced drive; build/venv outside it | Accepted | Immutability there is checksum-only: `chmod` is discarded by DrvFs (measured). `verify()` becomes mandatory, not advisory | A controlled measurement host exists |
+| ADR-036 | Vendor-BLAS cross-check gated on `blas_available()`, verified by CI, visibly skipped locally | Accepted | No root locally (no BLAS); GitHub Actions runner has root and installs it; a CI step fails the build if the tests skip when BLAS IS present | A controlled measurement host has root by default |
 
 ---
 

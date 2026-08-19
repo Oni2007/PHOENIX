@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include "../backends/cpu/gemm_blas.hpp"
 #include "../backends/cpu/gemm_kernels.hpp"
 #include "phoenix/correctness/comparator.hpp"
 
@@ -192,4 +193,65 @@ TEST(GemmErrorScale, ReferenceMatchesTheSinglePassVersion) {
     gemm_reference_fp64(M, N, K, 1.0, A, B, 0.0, c1);
     gemm_reference_and_scale_fp64(M, N, K, 1.0, A, B, 0.0, c2, scale);
     for (std::size_t i = 0; i < c1.size(); ++i) EXPECT_EQ(c1[i], c2[i]);
+}
+
+// ── Independent vendor-BLAS cross-check (ADR-036) ────────────────────────────
+//
+// GEMM-0's triple loop is algorithmically independent of naive/blocked/omp, but
+// it is still PHOENIX's own code -- a shared misunderstanding of the math would
+// pass every test above. An externally-maintained BLAS closes that gap. Gated on
+// runtime availability: this dev host has no root and no BLAS, so the test SKIPs
+// visibly rather than either failing spuriously or silently vanishing. CI
+// installs libopenblas-dev and actually exercises the comparison.
+
+TEST_P(GemmShapes, BlasMatchesReferenceWhenAvailable) {
+    if (!phoenix::cpu::blas_available()) {
+        GTEST_SKIP() << "no BLAS on this host (expected without root; see ADR-036). "
+                        "Exercised in CI, where libopenblas-dev is installed.";
+    }
+    const auto s = GetParam();
+    auto A = random_matrix(static_cast<std::size_t>(s.M * s.K), 77);
+    auto B = random_matrix(static_cast<std::size_t>(s.K * s.N), 88);
+    std::vector<double> ref(static_cast<std::size_t>(s.M * s.N), 0.0);
+    std::vector<double> scale(static_cast<std::size_t>(s.M * s.N), 0.0);
+    std::vector<double> got(static_cast<std::size_t>(s.M * s.N), 0.0);
+
+    gemm_reference_and_scale_fp64(s.M, s.N, s.K, 1.0, A, B, 0.0, ref, scale);
+    gemm_blas_fp64(s.M, s.N, s.K, 1.0, A, B, 0.0, got);
+
+    const auto r = compare(got, ref, scale, DType::FP64, s.K, 8.0);
+    EXPECT_TRUE(r.passed) << "PHOENIX reference disagrees with an independent BLAS: "
+                          << "max_rel_err=" << r.max_rel_err << " tol=" << r.tolerance_rel;
+}
+
+TEST(GemmBlasCrossCheck, Fp32BlasAgreesWithFp64ReferenceAtItsOwnTolerance) {
+    if (!phoenix::cpu::blas_available()) {
+        GTEST_SKIP() << "no BLAS on this host; see ADR-036";
+    }
+    const std::int64_t M = 48, N = 40, K = 96;
+    auto A = random_matrix(static_cast<std::size_t>(M * K), 111);
+    auto B = random_matrix(static_cast<std::size_t>(K * N), 222);
+    std::vector<float> A32(A.size()), B32(B.size());
+    for (std::size_t i = 0; i < A.size(); ++i) A32[i] = static_cast<float>(A[i]);
+    for (std::size_t i = 0; i < B.size(); ++i) B32[i] = static_cast<float>(B[i]);
+
+    std::vector<double> ref(static_cast<std::size_t>(M * N), 0.0);
+    std::vector<double> scale(static_cast<std::size_t>(M * N), 0.0);
+    gemm_reference_and_scale_fp64(M, N, K, 1.0, A, B, 0.0, ref, scale);
+
+    std::vector<float> c32(static_cast<std::size_t>(M * N), 0.0F);
+    gemm_blas_fp32(M, N, K, 1.0F, A32, B32, 0.0F, c32);
+    std::vector<double> got(c32.begin(), c32.end());
+
+    const auto r = compare(got, ref, scale, DType::FP32, K, 8.0);
+    EXPECT_TRUE(r.passed) << "max_rel_err=" << r.max_rel_err << " tol=" << r.tolerance_rel;
+}
+
+TEST(GemmBlasCrossCheck, UnavailableBlasThrowsRatherThanSilentlyReturningGarbage) {
+    if (phoenix::cpu::blas_available()) {
+        GTEST_SKIP() << "BLAS IS available on this host; the not-available path is untestable "
+                        "here. Exercised on the (more common) no-BLAS dev host instead.";
+    }
+    std::vector<double> A{1.0}, B{1.0}, C{0.0};
+    EXPECT_THROW(gemm_blas_fp64(1, 1, 1, 1.0, A, B, 0.0, C), std::exception);
 }

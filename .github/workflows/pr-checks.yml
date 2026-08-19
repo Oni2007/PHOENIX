@@ -37,6 +37,12 @@ jobs:
       - name: T0 - type check (strict)
         run: .venv/bin/mypy
 
+      - name: Install BLAS
+        # The GitHub-hosted runner has root; the local dev host does not (ADR-036).
+        # This is where the vendor-BLAS cross-check actually gets exercised, not
+        # skipped - the skip path is verified separately on the dev host.
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libopenblas-dev
+
       - name: Build C++ and bindings
         run: |
           .venv/bin/cmake -S . -B build -G Ninja \
@@ -46,6 +52,21 @@ jobs:
 
       - name: T2/T3/T4 - C++ unit and correctness tests
         run: ./build/phoenix_tests
+
+      - name: Assert the BLAS cross-check actually ran (not silently skipped)
+        # libopenblas-dev was installed above. If these two tests still SKIP here,
+        # find_package(BLAS) or the CBLAS linkage is broken - that is a CI failure,
+        # not a quiet pass. Deliberately excludes
+        # GemmBlasCrossCheck.UnavailableBlasThrowsRatherThanSilentlyReturningGarbage,
+        # which is SUPPOSED to skip itself whenever BLAS is present - it exists to
+        # cover the opposite (no-BLAS) host.
+        run: |
+          FILTER="ShapeMatrix/GemmShapes.BlasMatchesReferenceWhenAvailable/*:GemmBlasCrossCheck.Fp32BlasAgreesWithFp64ReferenceAtItsOwnTolerance"
+          if ./build/phoenix_tests --gtest_filter="$FILTER" 2>&1 | grep -q "\[  SKIPPED \]"; then
+            echo "::error::BLAS is installed on this runner but the cross-check tests skipped anyway"
+            exit 1
+          fi
+          echo "BLAS cross-check ran for real"
 
       - name: T1/T5/T7 - Python unit, integration and property tests
         run: PYTHONPATH=$PWD/python:$PWD/build .venv/bin/python -m pytest -q

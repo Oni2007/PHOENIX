@@ -92,7 +92,8 @@ research output. Full text in [CLAUDE.md](CLAUDE.md); rationale in the TDD.
 | Compute plane | C++20, CPU + synthetic backends, GEMM ladder (naive / blocked / OpenMP) |
 | Control plane | Python 3.12 — config, discovery, orchestration, store, analysis, CLI |
 | Boundary | nanobind, one JSON crossing per run |
-| Tests | 80 C++ (GoogleTest) + 32 Python (pytest/hypothesis), all passing |
+| Tests | 94 C++ (GoogleTest) + 33 Python (pytest/hypothesis), all passing |
+| Correctness cross-check | Independent vendor BLAS (CBLAS), gated on availability (ADR-036) — skips visibly here, CI-verified against `libopenblas-dev` |
 | Static analysis | `ruff` clean, `mypy --strict` clean |
 | Experiments executed | EXP-001 — 72 runs, 2 520 raw samples, all correctness passing |
 

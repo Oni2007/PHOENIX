@@ -11,6 +11,7 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
+#include "../backends/cpu/gemm_blas.hpp"
 #include "phoenix/backend/backend.hpp"
 #include "phoenix/bench/executor.hpp"
 #include "phoenix/bench/sample_buffer.hpp"
@@ -125,12 +126,18 @@ NB_MODULE(phoenix_core, m) {
         compiler = "gcc " + std::to_string(__GNUC__) + "." + std::to_string(__GNUC_MINOR__) + "." +
                    std::to_string(__GNUC_PATCHLEVEL__);
 #endif
-        std::string openmp = "false";
 #ifdef PHOENIX_HAVE_OPENMP
-        openmp = "true";
+        constexpr bool kHaveOpenmp = true;
+#else
+        constexpr bool kHaveOpenmp = false;
 #endif
+        const std::string openmp = kHaveOpenmp ? "true" : "false";
+        // BLAS availability is a fact about THIS build, checked at runtime via the
+        // same function the GEMM correctness tests use -- one source of truth, not
+        // two independently-maintained flags that could drift apart.
+        const std::string blas = phoenix::cpu::blas_available() ? "true" : "false";
         return std::string("{\"compiler\":\"") + compiler + "\",\"cxx_standard\":\"" +
-               std::to_string(__cplusplus) + "\",\"openmp\":" + openmp +
+               std::to_string(__cplusplus) + "\",\"openmp\":" + openmp + ",\"blas\":" + blas +
                ",\"build_type\":\"" + PHOENIX_BUILD_TYPE + "\"}";
     });
 
