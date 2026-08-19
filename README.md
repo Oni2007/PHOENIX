@@ -6,8 +6,8 @@ A research platform for measuring, benchmarking, and modelling computation acros
 heterogeneous AI accelerators — with the long-term goal of determining, from evidence
 rather than assumption, which computational substrate suits which workload.
 
-> **Status: pre-implementation.** This repository currently contains design documents
-> only. There is no source code, build system, or test suite. See
+> **Status: Weeks 1–4 of the v0.1 plan are complete.** A working measurement pipeline
+> runs end to end on CPU. Weeks 5–12 (CUDA onward) await hardware. See
 > [Current state](#current-state) below.
 
 ---
@@ -88,18 +88,30 @@ research output. Full text in [CLAUDE.md](CLAUDE.md); rationale in the TDD.
 
 | | |
 |---|---|
-| Phase | Architecture and research design |
-| Source code | None |
-| Build system | None |
-| Tests | None |
-| Design document | Complete and reviewed |
+| Phase | Weeks 1–4 complete; weeks 5–12 not started |
+| Compute plane | C++20, CPU + synthetic backends, GEMM ladder (naive / blocked / OpenMP) |
+| Control plane | Python 3.12 — config, discovery, orchestration, store, analysis, CLI |
+| Boundary | nanobind, one JSON crossing per run |
+| Tests | 80 C++ (GoogleTest) + 32 Python (pytest/hypothesis), all passing |
+| Static analysis | `ruff` clean, `mypy --strict` clean |
+| Experiments executed | EXP-001 — 72 runs, 2 520 raw samples, all correctness passing |
 
-The design document ends at an explicit **implementation gate**: implementation code is
-authorised only on an instruction of the form *"Start PHOENIX v0.1 implementation."*
-Until then the project stays in architecture/research-design mode.
+**What is not built:** every CUDA backend (weeks 5–9), HIP and TPU adapters
+(weeks 10–11), profiling infrastructure (week 8), the literature database
+(week 11), roofline analysis, and power/energy — which stays `NOT YET MEASURED`
+because no characterised power source exists on this host (ADR-024).
 
-Recommended first slice is Weeks 1–4 of the implementation plan, which is entirely
-GPU-free and delivers a working end-to-end measurement pipeline on CPU.
+### Try it
+
+From inside WSL2:
+
+```bash
+source .venv/bin/activate
+export PYTHONPATH=$PWD/python:$PWD/build
+python -m phoenix.cli.main discover
+python -m phoenix.cli.main run experiments/EXP-001_cpu_reference_gemm/config.yaml
+python -m phoenix.cli.main report EXP-001
+```
 
 ## Repository layout
 
@@ -157,3 +169,18 @@ are not supported. `cmake` and `ninja` are not yet installed and are a Week 1 ta
 ## Licence
 
 Apache-2.0. See [LICENSE](LICENSE).
+
+## A finding from the first run
+
+The first execution of EXP-001 failed 36 of 72 runs on correctness — every fp32 run,
+while every fp64 run passed bit-exactly. The cause was not a kernel: it was the
+comparator, which scaled error by `|C_ij|` and so measured catastrophic cancellation
+in the input data rather than implementation error.
+
+The tolerance constant was **not** raised. The error model was corrected to scale by
+`(|A|·|B|)_ij`, after which fp32 error lands at ≈2·eps(fp32), flat in K. See
+[ADR-034](docs/adr/ADR-034-gemm-error-scale.md) and
+[FIND-001](research/notes/FIND-001-fp32-cancellation.md).
+
+This is the kind of thing the v0.1 ordering exists to catch: it was found on a CPU
+reference kernel, at the cheapest possible point, rather than on a GPU months later.

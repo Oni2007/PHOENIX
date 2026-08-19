@@ -1,0 +1,70 @@
+schema_version: "1.0.0"
+experiment_id: "EXP-001"
+experiment_version: "1.0.0"
+title: "CPU reference GEMM"
+
+hypothesis: |
+  A naive triple-loop CPU GEMM will be compute-bound at small sizes and
+  increasingly memory-bound as the working set exceeds cache, with a transition
+  detectable in the measured scaling curve. Blocked and OpenMP implementations
+  will attain lower host wall time than the naive implementation at sizes where
+  the working set exceeds cache.
+
+  This is a HYPOTHESIS. It is not a result.
+
+  NOTE ON THIS RUN'S STANDING (ADR-032): the development host has hybrid P/E
+  cores, a mobile thermal envelope, and a WSL2 hypervisor. Every run produced
+  here is PROVISIONAL and validates the PIPELINE, not the CPU. Do not cite it.
+
+workload:
+  kind: GEMM
+  sweep:
+    dimensions:
+      - {M: 128,  N: 128,  K: 128}
+      - {M: 256,  N: 256,  K: 256}
+      - {M: 384,  N: 384,  K: 384}    # not a power of two, deliberately
+      - {M: 512,  N: 512,  K: 512}
+    dtype:
+      - {a: fp64, b: fp64, c: fp64, compute: fp64}
+      - {a: fp32, b: fp32, c: fp32, compute: fp32}
+  alpha: 1.0
+  beta: 0.0
+  seed: 20260819
+
+execution:
+  backends: ["cpu"]
+  implementations: ["gemm_naive", "gemm_blocked", "gemm_omp"]
+
+measurement:
+  warmup_iterations: 5
+  measure_iterations: 30
+  repetitions: 3
+  timing_method: host_wall
+  inter_repetition_cooldown_s: 0.0
+  outlier_policy:
+    rule: mad
+    threshold: 3.0
+    action: flag          # never delete
+
+correctness:
+  enabled: true
+  reference: cpu_reference
+  tolerance_c: 8.0
+
+validity:
+  min_valid_samples: 25
+  max_cv: 0.25            # this host is noisy; the gate FLAGS rather than hides it
+
+power:
+  method: none            # no characterised power source: energy stays NOT YET MEASURED
+  required: false
+
+output:
+  raw_dir: "results/raw"
+  retain_warmup_samples: true
+  emit_reproducibility_package: true
+
+provenance:
+  author: "PHOENIX v0.1 implementation, weeks 1-4"
+  created: "2026-08-19"
+  supersedes: null

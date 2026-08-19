@@ -1,0 +1,171 @@
+{
+  "$defs": {
+    "Confidence": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ],
+      "title": "Confidence",
+      "type": "string"
+    },
+    "Identity": {
+      "additionalProperties": false,
+      "properties": {
+        "architecture": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Architecture"
+        },
+        "family": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Family"
+        },
+        "form_factor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Form Factor"
+        },
+        "microarchitecture": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Microarchitecture"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "vendor": {
+          "title": "Vendor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "vendor",
+        "model"
+      ],
+      "title": "Identity",
+      "type": "object"
+    },
+    "ProvenanceSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "authored_by": {
+          "title": "Authored By",
+          "type": "string"
+        },
+        "last_verified": {
+          "title": "Last Verified",
+          "type": "string"
+        },
+        "overall_confidence": {
+          "$ref": "#/$defs/Confidence"
+        },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        }
+      },
+      "required": [
+        "authored_by",
+        "last_verified",
+        "overall_confidence"
+      ],
+      "title": "ProvenanceSummary",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "compute": {
+      "additionalProperties": true,
+      "title": "Compute",
+      "type": "object"
+    },
+    "device_class": {
+      "title": "Device Class",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "identity": {
+      "$ref": "#/$defs/Identity"
+    },
+    "memory": {
+      "additionalProperties": true,
+      "title": "Memory",
+      "type": "object"
+    },
+    "power": {
+      "additionalProperties": true,
+      "title": "Power",
+      "type": "object"
+    },
+    "provenance_summary": {
+      "$ref": "#/$defs/ProvenanceSummary"
+    },
+    "record_revision": {
+      "default": 1,
+      "title": "Record Revision",
+      "type": "integer"
+    },
+    "schema_version": {
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "software": {
+      "additionalProperties": true,
+      "title": "Software",
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "device_class",
+    "identity",
+    "provenance_summary"
+  ],
+  "title": "DeviceRecord",
+  "type": "object"
+}

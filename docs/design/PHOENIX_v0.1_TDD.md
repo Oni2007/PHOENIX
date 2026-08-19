@@ -868,6 +868,22 @@ tolerance_rel(dtype, K) = C · eps(dtype) · sqrt(K)
 
 with `C` a small, per-dtype, **committed and reviewed** constant, and the `sqrt(K)` term reflecting random-walk error accumulation over the reduction. Both absolute and relative error are checked; the absolute floor prevents relative-error blowup near zero.
 
+**AMENDED 2026-08-19 (ADR-034), after the first execution of EXP-001.** The
+tolerance above did not state what the relative error is measured *relative to*.
+The correct denominator is the sum of absolute products `(|A|·|B|)_ij`, not
+`|C_ij|`:
+
+```text
+|Ĉ - C|_ij  ≤  C · eps(dtype) · sqrt(K) · (|A|·|B|)_ij
+```
+
+Dividing by `|C_ij|` measures catastrophic cancellation, which is a property of the
+input data rather than of the implementation, and it caused all 36 fp32 runs of
+EXP-001 to fail at 54×–2176× tolerance while every fp64 run passed bit-exactly.
+`C` was **not** raised. Cancellation is still recorded, as `max_cancellation`, but
+it is not the pass/fail criterion. See `docs/adr/ADR-034-gemm-error-scale.md` and
+`research/notes/FIND-001-fp32-cancellation.md`.
+
 *Why `sqrt(K)` rather than `K`:* worst-case linear accumulation is achievable but pathological for the random inputs used here; `sqrt(K)` matches expected behaviour for randomly-signed rounding errors. **This choice is an assumption and is recorded as one.** If a kernel fails only via this term, the failure is investigated, not accommodated by loosening `C`.
 
 **Hard rule:** a tolerance constant is never raised to make a failing kernel pass. Raising `C` requires a written numerical justification in review. This rule exists because loosening a tolerance is the easiest way to turn a broken kernel into a fast one.
@@ -1737,6 +1753,7 @@ Four distinct lines/points, **visually distinguished by provenance class**:
 | ADR-031 | **WSL2 / Ubuntu 26.04 is the canonical development platform**; Windows-native (MSVC) is not supported | Accepted | The entire §5 stack, §22 containers, and §21 CI are Linux-native. Ubuntu and Docker Desktop are already installed; the Windows side has no C++ toolchain at all. Windows-native would require rewriting §5, §22, and §30 for no scientific gain. | A native Linux workstation becomes the primary development machine, at which point WSL2 becomes one supported option rather than the canonical one |
 | ADR-032 | **The development host is not a measurement host.** Runs from it are `PROVISIONAL` and unpublishable | **Accepted — blocking** | Hybrid P/E cores (R-19), WSL2 virtualisation (R-20), and a laptop thermal envelope (R-21) each independently violate §32's validity criteria. Executing EXP-001 here validates the pipeline; it does not measure a CPU. | A controlled measurement host is provisioned and characterised |
 | ADR-033 | Project interpreter pinned by `uv` independently of the system Python | Accepted | System Python in WSL2 is 3.14.4, above §5's tested range; pinning decouples the project from distro drift | §5's tested range is extended after validation |
+| ADR-034 | GEMM correctness scales error by `(\|A\|·\|B\|)`, not `\|C\|`; `C` unchanged | Accepted | Dividing by `\|C\|` measures cancellation in the input data, not implementation error; found by EXP-001's first execution | Mixed-precision accumulate paths (EXP-006) |
 
 ---
 

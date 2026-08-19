@@ -4,9 +4,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current repository state
 
-**There is no source code, build system, or test suite in this repository yet.** Tracked files are `README.md`, `LICENSE`, `.gitignore`, `CLAUDE.md`, `docs/design/PHOENIX_v0.1_TDD.md`, `docs/design/PHOENIX_MASTER_PROMPT.md`, and `docs/research/PHOENIX_MASTER_RESEARCH_CONTEXT.md`.
+**Weeks 1–4 of the implementation plan are complete.** The repository contains a
+working C++ compute plane, Python control plane, nanobind boundary, immutable store,
+analysis pipeline, and CLI. Weeks 5–12 (CUDA onward) are not started.
 
-Do not invent build/lint/test commands. None exist until Week 1 of the implementation plan is executed. The commands listed under "Planned toolchain" below describe what will exist after implementation begins — verify a tool is actually present before running it.
+### Commands that actually work
+
+Run everything from **inside WSL2**, from the repository root, with the venv active:
+
+```bash
+source .venv/bin/activate
+make build          # cmake + ninja
+make test           # 80 C++ tests + 32 Python tests
+make lint           # ruff check + format --check
+make typecheck      # mypy --strict
+```
+
+CLI: `phoenix discover | validate <cfg> | run <cfg> | analyze EXP-001 | catalogue |
+report EXP-001 | verify-package <run_dir> | run-info <run_dir>`.
+
+Invoke as `python -m phoenix.cli.main <cmd>` with
+`PYTHONPATH=$PWD/python:$PWD/build` until the package is pip-installed.
+
+Do not invent commands beyond these. Weeks 5+ toolchain (CUDA, Nsight, HIP) does not
+exist yet — verify a tool is present before running it.
 
 ## The design document is the specification
 
@@ -18,7 +39,11 @@ Do not invent build/lint/test commands. None exist until Week 1 of the implement
 
 ## Implementation gate
 
-The TDD ends at §38 with an explicit gate: implementation code is authorized only on an instruction of the form **"Start PHOENIX v0.1 implementation."** Until then the project stays in architecture/research-design mode. Recommended first slice is Weeks 1–4 (§31), which is entirely GPU-free.
+The gate at TDD §38 was opened for **Weeks 1–4 only**, and those are done.
+
+Weeks 5–9 require a physical NVIDIA GPU that does not exist yet, and week 10+ requires
+AMD/TPU access. Do not begin them on this host. The next authorised slice needs its own
+instruction naming the weeks.
 
 ## What PHOENIX v0.1 is
 
