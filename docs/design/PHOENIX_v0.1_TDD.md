@@ -33,7 +33,38 @@ The central insight driving this design: the hardest part of comparing a GPU aga
 
 > For a given GPU, how does attained GEMM performance relate to vendor-reported theoretical peak as a function of matrix size, precision, and memory access pattern — and what, measured rather than assumed, accounts for the gap?
 
-**Critical environmental finding.** The development container this design was authored in has **no NVIDIA GPU, no CUDA toolkit, and no ROCm** (verified: `nvidia-smi`, `nvcc`, `rocminfo` all absent; Python 3.11.15, GCC 13.3.0, CMake 3.28.3, 4 CPU cores present). This is not a footnote — it dictates the entire CI architecture (§21) and forces a hard split between what can be developed/tested anywhere and what requires the physical GPU host. Any plan that assumes casual GPU access during development is wrong for this project's actual environment.
+**Critical environmental finding.** *(Revised 2026-08-19 against the actual development host. The original text described the authoring container, not this project's machine.)*
+
+The verified development host is:
+
+| Property | Verified value | How verified |
+|---|---|---|
+| Host OS | Microsoft Windows 11 Home 10.0.26200 | `Get-CimInstance Win32_OperatingSystem` |
+| Development environment | WSL2, Ubuntu 26.04 LTS, kernel 6.6.87.2-microsoft-standard-WSL2 | `wsl --list --verbose`, `uname -r` |
+| CPU | Intel Core i7-1355U — 10 physical / 12 logical, **hybrid P-core + E-core, mobile/laptop part** | `Get-CimInstance Win32_Processor` |
+| RAM | 15.7 GiB | `Get-CimInstance Win32_OperatingSystem` |
+| GPU | Intel Iris Xe Graphics (integrated). **No NVIDIA GPU. No discrete GPU of any kind.** | `Get-CimInstance Win32_VideoController` |
+| CUDA | `nvidia-smi`, `nvcc` both absent | `command -v` |
+| ROCm | absent | `command -v` |
+| Toolchain present (WSL2) | gcc 15.2.0, g++, make, git, python3 3.14.4 | `--version` |
+| Toolchain absent (WSL2) | **cmake, ninja** — must be installed in Week 1 | `command -v` |
+| Toolchain (Windows side) | no C++ compiler at all (`cl`, `gcc` both absent); Python 3.13.5; Docker Desktop; uv | `command -v` |
+
+**Three consequences, in order of importance.**
+
+**1. This host is a development host, not a measurement host.** (ADR-032.) Three independent reasons, any one of which would be sufficient:
+
+- The i7-1355U is a **hybrid architecture**: performance and efficiency cores with different microarchitectures, clock ranges, and cache. A thread migrated between core types mid-run produces a bimodal timing distribution that is an artefact of the scheduler, not of the code under test.
+- It is a **15 W-class mobile part in a laptop chassis**. Sustained GEMM sweeps will thermally throttle. §32 would correctly mark such runs `THERMAL_THROTTLE` → INVALID.
+- **WSL2 is a virtual machine.** Its clock source, scheduling, and memory behaviour interpose a layer between PHOENIX's timers and the hardware. The magnitude of that layer's effect on `host_wall_ns` is `UNKNOWN` and would itself require characterisation (§37 item 11).
+
+Therefore: EXP-001 may be **executed** here to validate the pipeline end-to-end — that is Week 4's actual purpose — but its output is **development-grade data, marked `PROVISIONAL`, and is not publishable**. Any published CPU baseline requires a controlled measurement host. This does not delay the schedule; it changes what Week 4's acceptance criterion means, and §30 has been amended accordingly.
+
+**2. There is no CUDA path on this machine whatsoever.** Weeks 5–9 require a separate physical NVIDIA host that does not currently exist (§37 items 1 and 4). Weeks 1–4 are GPU-free by design and are unblocked today.
+
+**3. The CI architecture (§21) is confirmed, not merely assumed.** The CPU/GPU split, compile-only CUDA CI, and self-hosted GPU nightly tier are the correct response to this environment rather than a hypothetical one.
+
+**Version deviations to reconcile in Week 1:** the toolchain present in WSL2 (GCC 15.2, Python 3.14.4) is newer than §5 assumes (Python 3.11 floor, tested to 3.12). Resolution: `uv` pins the project interpreter to 3.11 or 3.12 independently of the system Python, and GCC 15 is used as-is with its version recorded in every environment manifest. Neither is a blocker; both are recorded rather than glossed.
 
 ---
 
@@ -1439,6 +1470,10 @@ EXP-001 (CPU ref, validates whole pipeline)
 | R-16 | Results directory grows unmanageably | Medium | Low | Disk monitoring | Parquet compression; archival policy; results git-ignored | Infra |
 | R-17 | Single-maintainer bus factor | High | High | — | Documentation-first; schemas as contracts; ADRs record reasoning | Lead |
 | R-18 | cuBLASLt autotuning state makes runs irreproducible | Medium | High | Repetition variance; algorithm ID logging | Record selected algorithm; control cache state between repetitions | Bench |
+| R-19 | **Hybrid P/E-core CPU produces bimodal timings** that look like a code property but are a scheduler artefact | Certain on dev host | High | Bimodal distribution in raw samples; per-sample core-ID capture | Capture core ID per sample; pin affinity to a single core type on the measurement host; never publish a CPU baseline from a hybrid part without affinity control | Bench |
+| R-20 | **WSL2 virtualisation layer distorts host timing** by an uncharacterised amount | Certain on dev host | Medium | Comparison against a native Linux host | Dev-host runs marked `PROVISIONAL`; characterise or avoid (§37 item 11); never publish from WSL2 | Bench |
+| R-21 | **Laptop thermal envelope invalidates sustained sweeps** | Certain on dev host | Medium | `THERMAL_THROTTLE` flag rate | Short pipeline-validation runs only on the dev host; real sweeps on the measurement host | Bench |
+| R-22 | **No measurement host exists yet** — neither CPU-controlled nor GPU | High | Very High | Schedule | Weeks 1–4 need none; procurement/access is the Week 4 decision point, not the Week 5 surprise | Lead |
 
 ---
 
@@ -1473,10 +1508,10 @@ v0.1 ships when **every** criterion below is satisfied and demonstrated.
 
 ### Functional
 
-- [ ] `git clone` → documented setup → working install on a CPU-only Linux host, with no GPU required for any step in Getting Started.
+- [ ] `git clone` → documented setup → working install on a CPU-only Linux host (native Linux **or** WSL2; both are supported and the manifest records which), with no GPU required for any step in Getting Started.
 - [ ] `phoenix discover` emits a complete, schema-valid environment + hardware manifest on CPU-only and on GPU hosts.
 - [ ] `phoenix validate <config>` rejects malformed configs with actionable messages; every rejection path has a test.
-- [ ] `phoenix run EXP-001` completes end-to-end on CPU and writes a complete reproducibility package.
+- [ ] `phoenix run EXP-001` completes end-to-end on CPU and writes a complete reproducibility package. **On the development host this validates the pipeline, not the CPU.** Runs from a hybrid-core, thermally-constrained, or virtualised host are marked `PROVISIONAL` and are not admissible as a published baseline (ADR-032). A publishable EXP-001 requires a controlled measurement host.
 - [ ] `phoenix run EXP-002..008` complete on an NVIDIA GPU host.
 - [ ] `phoenix analyze` produces aggregates, derived metrics, and roofline positions from stored raw data only.
 - [ ] `phoenix report EXP-xxx` produces a report with figures generated **exclusively** from raw data — verified by a test that mutates a raw sample and asserts the figure changes.
@@ -1699,6 +1734,9 @@ Four distinct lines/points, **visually distinguished by provenance class**:
 | ADR-028 | Schema back-compat replay gate in CI | Accepted | Mechanically enforces Rule 6 | — |
 | ADR-029 | CUTLASS excluded from v0.1 | Accepted | Understanding before borrowing | v0.2 comparison study |
 | ADR-030 | A-vs-A control mandatory before any A-vs-B claim | Accepted | Establishes the noise floor a claim must exceed | Never |
+| ADR-031 | **WSL2 / Ubuntu 26.04 is the canonical development platform**; Windows-native (MSVC) is not supported | Accepted | The entire §5 stack, §22 containers, and §21 CI are Linux-native. Ubuntu and Docker Desktop are already installed; the Windows side has no C++ toolchain at all. Windows-native would require rewriting §5, §22, and §30 for no scientific gain. | A native Linux workstation becomes the primary development machine, at which point WSL2 becomes one supported option rather than the canonical one |
+| ADR-032 | **The development host is not a measurement host.** Runs from it are `PROVISIONAL` and unpublishable | **Accepted — blocking** | Hybrid P/E cores (R-19), WSL2 virtualisation (R-20), and a laptop thermal envelope (R-21) each independently violate §32's validity criteria. Executing EXP-001 here validates the pipeline; it does not measure a CPU. | A controlled measurement host is provisioned and characterised |
+| ADR-033 | Project interpreter pinned by `uv` independently of the system Python | Accepted | System Python in WSL2 is 3.14.4, above §5's tested range; pinning decouples the project from distro drift | §5's tested range is extended after validation |
 
 ---
 
@@ -1765,6 +1803,9 @@ Genuinely undecidable without hardware, credentials, or vendor documentation. Ev
 8. **Current stable CUDA toolkit and driver versions ⚠** — must be verified against NVIDIA's current release at implementation time rather than assumed from this document.
 9. **Thermal and electrical environment of the GPU host** — ambient temperature stability and whether cooling is adequate for sustained runs. Directly determines whether long sweeps are valid or throttling-dominated.
 10. **Do institutional constraints exist on publishing benchmark results** for specific vendor hardware (some vendor EULAs restrict benchmark publication). **Blocks:** publication planning, not implementation.
+11. **What is WSL2's effect on host-side timing fidelity?** Clock source, scheduling, and memory behaviour interpose a VM layer of `UNKNOWN` magnitude between PHOENIX's timers and the hardware. Requires a side-by-side characterisation against a native Linux host. **Blocks:** any publishable measurement taken under WSL2 (ADR-032). Does not block development.
+12. **Will a controlled CPU measurement host exist?** Distinct from item 1, which concerns the GPU. A publishable CPU baseline (EXP-001) needs a machine with homogeneous cores, a stable thermal envelope, controllable frequency scaling, and no hypervisor. **Blocks:** publication of every CPU result; **does not block** Weeks 1–4, which only need the pipeline to run.
+13. **Can CPU affinity and frequency scaling be controlled on whatever measurement host is chosen?** Determines whether R-19's hybrid-core artefact is eliminated or merely observed and recorded.
 
 ---
 

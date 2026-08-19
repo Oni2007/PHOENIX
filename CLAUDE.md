@@ -62,19 +62,30 @@ C++20 / Python 3.11 / CUDA 12.x / CMake ≥ 3.24 / nanobind / GoogleTest / pytes
 
 ## Environment notes
 
-- **CUDA work requires a physical NVIDIA GPU.** No GPU, CUDA toolkit, or ROCm is present on the development host. Weeks 1–4 of the plan are deliberately GPU-free so development is not blocked by hardware availability.
+- **CUDA work requires a physical NVIDIA GPU.** None is present. Weeks 1–4 are deliberately GPU-free so development is not blocked by hardware availability.
 - **Which GPU PHOENIX will run on is still undecided** (TDD §37 item 1). It determines compute capability, available precisions, `CMAKE_CUDA_ARCHITECTURES`, and EXP-006's dtype coverage. Needed by Week 4.
 - **Do not put the working tree in a cloud-synced folder.** TDD §10 requires read-only checksummed directories under `results/`; sync clients fight that, and build trees thrash them.
+- **The tree currently lives on the Windows filesystem** (`C:\Users\Bruker\PHOENIX`, i.e. `/mnt/c/Users/Bruker/PHOENIX` from WSL2). That is fine while the repository is documents only. **Before Week 1's first build, move it onto the WSL2 filesystem** (e.g. `~/PHOENIX`): building across `/mnt/c` is slow, and its file-metadata semantics are not the ones §10's read-only immutability enforcement assumes. Clone or `git mv` — do not run a build in place.
 - Verify the CUDA toolkit and driver versions against NVIDIA's current release rather than trusting the TDD's `⚠`-marked pins.
 - AMD/ROCm and TPU are interface-only in v0.1. Do not claim support for hardware that has never executed a run.
 
-## Host platform — unresolved, blocks Week 1
+## Host platform — resolved
 
-The TDD's §1 "critical environmental finding" describes the **Linux container the document was authored in** (GCC 13.3.0, CMake 3.28.3, 4 cores, no GPU). **That is not this machine.** Development is on Windows 11.
+**All development happens inside WSL2 / Ubuntu 26.04** (ADR-031). Windows-native MSVC is not supported: the entire §5 stack, §22 containers, and §21 CI are Linux-native, and the Windows side has no C++ toolchain at all. Run builds, tests, and `phoenix` from the WSL2 shell, not from PowerShell or Git Bash.
 
-This is not cosmetic. TDD §5 (clang-tidy, OpenMP, BLAS), §22 (Docker images), and §30's Definition of Done ("working install on a CPU-only **Linux** host") all assume Linux. Before Week 1 begins, decide: **Windows-native (MSVC) or WSL2**, then amend §1, §5, §22, and §30 accordingly. Do not start Week 1 against an unstated platform assumption.
+Verified toolchain in WSL2: gcc 15.2.0, g++, make, git, python3 3.14.4. **cmake and ninja are absent and must be installed in Week 1.** The project interpreter is pinned by `uv` to 3.11/3.12 independently of the system Python 3.14 (ADR-033).
 
-What carries over unchanged regardless of that choice: no GPU is present, so Weeks 1–4 remain GPU-free and unblocked.
+## This machine cannot produce publishable measurements
+
+**ADR-032, and it is blocking.** The dev host is an i7-1355U laptop with hybrid P/E cores, a 15 W thermal envelope, and a WSL2 hypervisor between the timers and the hardware. Each of those independently violates §32's validity criteria:
+
+- Hybrid cores produce bimodal timing distributions that look like a code property but are a scheduler artefact (R-19).
+- Sustained sweeps will thermally throttle, which §32 correctly marks INVALID (R-21).
+- WSL2's timing distortion is `UNKNOWN` in magnitude and uncharacterised (R-20, §37 item 11).
+
+So: running EXP-001 here **validates the pipeline, not the CPU**. Its output is `PROVISIONAL` and must never be published or used as a baseline. Do not "fix" this by loosening a validity gate — the gates are working correctly. A publishable CPU baseline needs a controlled measurement host (§37 item 12).
+
+There is also **no NVIDIA GPU and no discrete GPU of any kind** here, so Weeks 5–9 need a separate host that does not yet exist. Weeks 1–4 are GPU-free and unblocked today.
 
 ## Known issues to resolve at implementation time
 

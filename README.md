@@ -141,10 +141,18 @@ implementation begins.
 Items that genuinely cannot be settled without hardware or credentials are listed in
 TDD §37. The ones on the critical path:
 
+- **Where will publishable measurements be taken?** The development host — a hybrid
+  P/E-core laptop under WSL2 — cannot produce them (ADR-032). Development is unaffected;
+  publication is blocked until a controlled measurement host exists.
 - Which specific NVIDIA GPU(s) PHOENIX will run on — needed by Week 4.
 - Whether a self-hosted GPU CI runner will be available.
 - Whether an external power meter is available. If not, energy stays `NOT YET MEASURED`
   in v0.1 — an acceptable outcome that must not be worked around with estimates.
+
+## Development platform
+
+All development happens inside **WSL2 / Ubuntu 26.04** (ADR-031). Windows-native builds
+are not supported. `cmake` and `ninja` are not yet installed and are a Week 1 task.
 
 ## Licence
 
