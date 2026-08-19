@@ -1,0 +1,64 @@
+# ── Benchmark data ────────────────────────────────────────────────────────────
+# TDD §8: results/ is git-ignored except run manifests. Benchmark data belongs in
+# an archival store with checksums, not in git history.
+results/
+!results/**/MANIFEST.json
+
+# ── Build ─────────────────────────────────────────────────────────────────────
+build/
+_build/
+cmake-build-*/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.pdb
+*.exe
+compile_commands.json
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+
+# NOTE: TDD §8 specifies a committed top-level Makefile as a convenience wrapper
+# over cmake/uv. It is deliberately NOT ignored here.
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# ── Profiling artefacts ───────────────────────────────────────────────────────
+# Nsight reports are large binaries; they live in a run's results/raw/<id>/profiling/
+# (already ignored above). These patterns catch stray ones written elsewhere.
+*.nsys-rep
+*.ncu-rep
+*.qdrep
+*.sqlite
+
+# ── Docs / site ───────────────────────────────────────────────────────────────
+site/
+docs/api/generated/
+
+# ── Editor / OS ───────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Claude Code ───────────────────────────────────────────────────────────────
+.claude/settings.local.json
