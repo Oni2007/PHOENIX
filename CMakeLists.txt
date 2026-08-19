@@ -25,6 +25,7 @@ add_library(phoenix_cpp STATIC
   cpp/src/bench/executor.cpp
   cpp/src/correctness/comparator.cpp
   cpp/backends/cpu/gemm_kernels.cpp
+  cpp/backends/cpu/gemm_blas.cpp
   cpp/backends/cpu/cpu_backend.cpp
   cpp/backends/synthetic/synthetic_backend.cpp
 )
@@ -44,6 +45,19 @@ else()
   # Recorded, not silently ignored: gemm_omp still runs, single-threaded, and the
   # environment manifest reports openmp=false so results are not misread.
   message(WARNING "PHOENIX: OpenMP NOT found - gemm_omp will run single-threaded")
+endif()
+
+# Independent vendor-BLAS cross-check (ADR-036). Optional: this development host
+# has no root and therefore no system BLAS. CI installs libopenblas-dev and
+# exercises the real path; here the correctness test visibly SKIPs rather than
+# silently vanishing.
+find_package(BLAS)
+if(BLAS_FOUND)
+  target_link_libraries(phoenix_cpp PUBLIC ${BLAS_LIBRARIES})
+  target_compile_definitions(phoenix_cpp PUBLIC PHOENIX_HAVE_BLAS)
+  message(STATUS "PHOENIX: BLAS found (${BLAS_LIBRARIES}) - vendor cross-check ACTIVE")
+else()
+  message(WARNING "PHOENIX: BLAS NOT found - vendor cross-check test will SKIP, not fail")
 endif()
 
 # ── python bindings ───────────────────────────────────────────────────────────
