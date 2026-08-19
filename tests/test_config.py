@@ -68,3 +68,21 @@ def test_outlier_action_cannot_be_delete() -> None:
     cfg["measurement"]["outlier_policy"]["action"] = "delete"
     with pytest.raises(ValidationError):
         ExperimentConfig.model_validate(cfg)
+
+
+def test_discovery_survives_absent_tools() -> None:
+    """An absent tool is recorded as null, never a crash and never a guess.
+
+    Regression: `"".splitlines()[0]` raised IndexError whenever a tool was missing
+    from PATH, which is the exact case discovery exists to handle.
+    """
+    from phoenix.discovery.environment import _first_line, collect_environment
+
+    assert _first_line(None) is None
+    assert _first_line("") is None
+    assert _first_line("one\ntwo") == "one"
+
+    env = collect_environment(None)
+    assert "gcc" in env["toolchain"]
+    assert "cmake" in env["toolchain"]
+    assert env["accelerators"]["nvidia_gpu_present"] is False

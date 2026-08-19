@@ -30,6 +30,19 @@ def _run(cmd: list[str]) -> str | None:
     return out.stdout.strip() if out.returncode == 0 else None
 
 
+def _first_line(text: str | None) -> str | None:
+    """First line of a command's output, or None if the command was absent.
+
+    An absent tool must be recorded as null, never crash the manifest and never be
+    guessed at. `"".splitlines()[0]` raises IndexError, which is precisely the
+    failure this helper exists to prevent.
+    """
+    if not text:
+        return None
+    lines = text.splitlines()
+    return lines[0] if lines else None
+
+
 def _detect_wsl() -> bool:
     release = platform.uname().release.lower()
     return "microsoft" in release or "wsl" in release
@@ -86,8 +99,10 @@ def collect_environment(build_info: dict[str, Any] | None = None) -> dict[str, A
             "executable": sys.executable,
         },
         "toolchain": {
-            "gcc": (_run(["gcc", "--version"]) or "").splitlines()[0] or None,
-            "cmake": (_run(["cmake", "--version"]) or "").splitlines()[0] or None,
+            # null means "not on PATH in this process", which is a fact worth
+            # recording -- not an error, and not something to guess at.
+            "gcc": _first_line(_run(["gcc", "--version"])),
+            "cmake": _first_line(_run(["cmake", "--version"])),
         },
         "accelerators": _accelerators(),
         "build_info": build_info,
