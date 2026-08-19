@@ -1,0 +1,23 @@
+# TDD §8: LF normalisation; Parquet/PNG and other artefacts as binary.
+* text=auto eol=lf
+
+*.md      text eol=lf
+*.yaml    text eol=lf
+*.yml     text eol=lf
+*.json    text eol=lf
+*.toml    text eol=lf
+*.py      text eol=lf
+*.cpp     text eol=lf
+*.hpp     text eol=lf
+*.cu      text eol=lf
+*.cuh     text eol=lf
+*.cmake   text eol=lf
+CMakeLists.txt text eol=lf
+Makefile  text eol=lf
+
+*.parquet   binary
+*.png       binary
+*.pdf       binary
+*.duckdb    binary
+*.nsys-rep  binary
+*.ncu-rep   binary

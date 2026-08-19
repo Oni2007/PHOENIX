@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "Provenance": {
+      "enum": [
+        "MEASURED",
+        "VENDOR_REPORTED",
+        "SIMULATED",
+        "ANALYTICAL",
+        "HYPOTHETICAL",
+        "DERIVED"
+      ],
+      "title": "Provenance",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Tier 3. A derived value is never MEASURED (TDD P5).\n\nThe formula, its inputs and its assumptions are stored so the value can be\nrecomputed if the formula changes. `assumptions` is mandatory and non-empty:\nthere is no such thing as a FLOP/s figure without a FLOP-counting convention,\nand unstated conventions are how incomparable numbers get compared.",
+  "properties": {
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "formula": {
+      "title": "Formula",
+      "type": "string"
+    },
+    "formula_version": {
+      "default": "1.0.0",
+      "title": "Formula Version",
+      "type": "string"
+    },
+    "inputs": {
+      "additionalProperties": true,
+      "title": "Inputs",
+      "type": "object"
+    },
+    "metric": {
+      "title": "Metric",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance",
+      "default": "DERIVED"
+    },
+    "unit": {
+      "title": "Unit",
+      "type": "string"
+    },
+    "valid": {
+      "default": true,
+      "title": "Valid",
+      "type": "boolean"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Value"
+    }
+  },
+  "required": [
+    "metric",
+    "value",
+    "unit",
+    "formula",
+    "inputs",
+    "assumptions"
+  ],
+  "title": "DerivedMetric",
+  "type": "object"
+}

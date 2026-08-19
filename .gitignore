@@ -1,69 +1,64 @@
-# Prerequisites
-*.d
+# ── Benchmark data ────────────────────────────────────────────────────────────
+# TDD §8: results/ is git-ignored except run manifests. Benchmark data belongs in
+# an archival store with checksums, not in git history.
+results/
+!results/**/MANIFEST.json
 
-# Compiled Object files
-*.slo
-*.lo
+# ── Build ─────────────────────────────────────────────────────────────────────
+build/
+_build/
+cmake-build-*/
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-*.so.*
-
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
 *.a
 *.lib
-
-# Executables
+*.so
+*.so.*
+*.dylib
+*.dll
+*.pdb
 *.exe
-*.out
-*.app
-
-# Build directories
-build/
-Build/
-build-*/
-
-# CMake generated files
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-install_manifest.txt
 compile_commands.json
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
 
-# Temporary files
-*.tmp
-*.log
-*.bak
+# NOTE: TDD §8 specifies a committed top-level Makefile as a convenience wrapper
+# over cmake/uv. It is deliberately NOT ignored here.
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# ── Profiling artefacts ───────────────────────────────────────────────────────
+# Nsight reports are large binaries; they live in a run's results/raw/<id>/profiling/
+# (already ignored above). These patterns catch stray ones written elsewhere.
+*.nsys-rep
+*.ncu-rep
+*.qdrep
+*.sqlite
+
+# ── Docs / site ───────────────────────────────────────────────────────────────
+site/
+docs/api/generated/
+
+# ── Editor / OS ───────────────────────────────────────────────────────────────
+.vscode/
+.idea/
 *.swp
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# vcpkg
-vcpkg_installed/
-
-# debug information files
-*.dwo
-
-# test output & cache
-Testing/
-.cache/
+# ── Claude Code ───────────────────────────────────────────────────────────────
+.claude/settings.local.json

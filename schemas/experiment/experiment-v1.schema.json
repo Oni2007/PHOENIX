@@ -1,0 +1,433 @@
+{
+  "$defs": {
+    "Correctness": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "reference": {
+          "const": "cpu_reference",
+          "default": "cpu_reference",
+          "title": "Reference",
+          "type": "string"
+        },
+        "tolerance_c": {
+          "default": 8.0,
+          "exclusiveMinimum": 0,
+          "title": "Tolerance C",
+          "type": "number"
+        }
+      },
+      "title": "Correctness",
+      "type": "object"
+    },
+    "DType": {
+      "enum": [
+        "fp64",
+        "fp32"
+      ],
+      "title": "DType",
+      "type": "string"
+    },
+    "DTypeCombo": {
+      "additionalProperties": false,
+      "properties": {
+        "a": {
+          "$ref": "#/$defs/DType",
+          "default": "fp64"
+        },
+        "b": {
+          "$ref": "#/$defs/DType",
+          "default": "fp64"
+        },
+        "c": {
+          "$ref": "#/$defs/DType",
+          "default": "fp64"
+        },
+        "compute": {
+          "$ref": "#/$defs/DType",
+          "default": "fp64"
+        }
+      },
+      "title": "DTypeCombo",
+      "type": "object"
+    },
+    "Dimensions": {
+      "additionalProperties": false,
+      "properties": {
+        "K": {
+          "exclusiveMinimum": 0,
+          "title": "K",
+          "type": "integer"
+        },
+        "M": {
+          "exclusiveMinimum": 0,
+          "title": "M",
+          "type": "integer"
+        },
+        "N": {
+          "exclusiveMinimum": 0,
+          "title": "N",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "M",
+        "N",
+        "K"
+      ],
+      "title": "Dimensions",
+      "type": "object"
+    },
+    "Execution": {
+      "additionalProperties": false,
+      "properties": {
+        "backends": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Backends",
+          "type": "array"
+        },
+        "implementations": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Implementations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "backends",
+        "implementations"
+      ],
+      "title": "Execution",
+      "type": "object"
+    },
+    "Measurement": {
+      "additionalProperties": false,
+      "properties": {
+        "inter_repetition_cooldown_s": {
+          "default": 0.0,
+          "minimum": 0,
+          "title": "Inter Repetition Cooldown S",
+          "type": "number"
+        },
+        "measure_iterations": {
+          "default": 100,
+          "exclusiveMinimum": 0,
+          "title": "Measure Iterations",
+          "type": "integer"
+        },
+        "outlier_policy": {
+          "$ref": "#/$defs/OutlierPolicy",
+          "default": {
+            "action": "flag",
+            "rule": "mad",
+            "threshold": 3.0
+          }
+        },
+        "repetitions": {
+          "default": 5,
+          "exclusiveMinimum": 0,
+          "title": "Repetitions",
+          "type": "integer"
+        },
+        "timing_method": {
+          "const": "host_wall",
+          "default": "host_wall",
+          "title": "Timing Method",
+          "type": "string"
+        },
+        "warmup_iterations": {
+          "default": 20,
+          "minimum": 0,
+          "title": "Warmup Iterations",
+          "type": "integer"
+        }
+      },
+      "title": "Measurement",
+      "type": "object"
+    },
+    "OutlierPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "default": "flag",
+          "enum": [
+            "flag",
+            "exclude"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "rule": {
+          "default": "mad",
+          "enum": [
+            "mad",
+            "tukey",
+            "none"
+          ],
+          "title": "Rule",
+          "type": "string"
+        },
+        "threshold": {
+          "default": 3.0,
+          "title": "Threshold",
+          "type": "number"
+        }
+      },
+      "title": "OutlierPolicy",
+      "type": "object"
+    },
+    "Output": {
+      "additionalProperties": false,
+      "properties": {
+        "emit_reproducibility_package": {
+          "default": true,
+          "title": "Emit Reproducibility Package",
+          "type": "boolean"
+        },
+        "raw_dir": {
+          "default": "results/raw",
+          "title": "Raw Dir",
+          "type": "string"
+        },
+        "retain_warmup_samples": {
+          "default": true,
+          "title": "Retain Warmup Samples",
+          "type": "boolean"
+        }
+      },
+      "title": "Output",
+      "type": "object"
+    },
+    "Power": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "const": "none",
+          "default": "none",
+          "title": "Method",
+          "type": "string"
+        },
+        "required": {
+          "default": false,
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "title": "Power",
+      "type": "object"
+    },
+    "ProvenanceBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "title": "Author",
+          "type": "string"
+        },
+        "created": {
+          "title": "Created",
+          "type": "string"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        }
+      },
+      "required": [
+        "author",
+        "created"
+      ],
+      "title": "ProvenanceBlock",
+      "type": "object"
+    },
+    "Sweep": {
+      "additionalProperties": false,
+      "properties": {
+        "dimensions": {
+          "items": {
+            "$ref": "#/$defs/Dimensions"
+          },
+          "minItems": 1,
+          "title": "Dimensions",
+          "type": "array"
+        },
+        "dtype": {
+          "items": {
+            "$ref": "#/$defs/DTypeCombo"
+          },
+          "minItems": 1,
+          "title": "Dtype",
+          "type": "array"
+        }
+      },
+      "required": [
+        "dimensions",
+        "dtype"
+      ],
+      "title": "Sweep",
+      "type": "object"
+    },
+    "Validity": {
+      "additionalProperties": false,
+      "properties": {
+        "max_cv": {
+          "default": 0.0,
+          "minimum": 0,
+          "title": "Max Cv",
+          "type": "number"
+        },
+        "min_valid_samples": {
+          "default": 1,
+          "minimum": 0,
+          "title": "Min Valid Samples",
+          "type": "integer"
+        }
+      },
+      "title": "Validity",
+      "type": "object"
+    },
+    "Workload": {
+      "additionalProperties": false,
+      "properties": {
+        "alpha": {
+          "default": 1.0,
+          "title": "Alpha",
+          "type": "number"
+        },
+        "beta": {
+          "default": 0.0,
+          "title": "Beta",
+          "type": "number"
+        },
+        "kind": {
+          "const": "GEMM",
+          "default": "GEMM",
+          "title": "Kind",
+          "type": "string"
+        },
+        "seed": {
+          "default": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "sweep": {
+          "$ref": "#/$defs/Sweep"
+        }
+      },
+      "required": [
+        "sweep"
+      ],
+      "title": "Workload",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "correctness": {
+      "$ref": "#/$defs/Correctness",
+      "default": {
+        "enabled": true,
+        "reference": "cpu_reference",
+        "tolerance_c": 8.0
+      }
+    },
+    "execution": {
+      "$ref": "#/$defs/Execution"
+    },
+    "experiment_id": {
+      "pattern": "^EXP-\\d{3}$",
+      "title": "Experiment Id",
+      "type": "string"
+    },
+    "experiment_version": {
+      "title": "Experiment Version",
+      "type": "string"
+    },
+    "hypothesis": {
+      "minLength": 1,
+      "title": "Hypothesis",
+      "type": "string"
+    },
+    "measurement": {
+      "$ref": "#/$defs/Measurement",
+      "default": {
+        "inter_repetition_cooldown_s": 0.0,
+        "measure_iterations": 100,
+        "outlier_policy": {
+          "action": "flag",
+          "rule": "mad",
+          "threshold": 3.0
+        },
+        "repetitions": 5,
+        "timing_method": "host_wall",
+        "warmup_iterations": 20
+      }
+    },
+    "output": {
+      "$ref": "#/$defs/Output",
+      "default": {
+        "emit_reproducibility_package": true,
+        "raw_dir": "results/raw",
+        "retain_warmup_samples": true
+      }
+    },
+    "power": {
+      "$ref": "#/$defs/Power",
+      "default": {
+        "method": "none",
+        "required": false
+      }
+    },
+    "provenance": {
+      "$ref": "#/$defs/ProvenanceBlock"
+    },
+    "schema_version": {
+      "const": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "validity": {
+      "$ref": "#/$defs/Validity",
+      "default": {
+        "max_cv": 0.0,
+        "min_valid_samples": 1
+      }
+    },
+    "workload": {
+      "$ref": "#/$defs/Workload"
+    }
+  },
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "experiment_version",
+    "title",
+    "hypothesis",
+    "workload",
+    "execution",
+    "provenance"
+  ],
+  "title": "ExperimentConfig",
+  "type": "object"
+}

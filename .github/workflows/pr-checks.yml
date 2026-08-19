@@ -1,0 +1,87 @@
+name: pr-checks
+
+# Everything that can be tested without a GPU must be, so that the vast majority
+# of development is never blocked on hardware availability (TDD 21.2).
+#
+# Performance is deliberately NOT tested here. Shared runners are virtualised,
+# noisy-neighboured and thermally uncontrolled; a number from one fails PHOENIX's
+# own validity criteria, and gating on it would train the team to ignore failures.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  static-and-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Create environment
+        run: |
+          uv venv --python 3.12 .venv
+          uv pip install -e ".[dev]"
+
+      - name: T0 - format and lint
+        run: |
+          .venv/bin/ruff check python tests
+          .venv/bin/ruff format --check python tests
+
+      - name: T0 - type check (strict)
+        run: .venv/bin/mypy
+
+      - name: Build C++ and bindings
+        run: |
+          .venv/bin/cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DPython_EXECUTABLE=$PWD/.venv/bin/python
+          .venv/bin/cmake --build build -j
+
+      - name: T2/T3/T4 - C++ unit and correctness tests
+        run: ./build/phoenix_tests
+
+      - name: T1/T5/T7 - Python unit, integration and property tests
+        run: PYTHONPATH=$PWD/python:$PWD/build .venv/bin/python -m pytest -q
+
+      - name: Schema validity
+        run: |
+          PYTHONPATH=$PWD/python .venv/bin/python - <<'PY'
+          import json, pathlib
+          for p in pathlib.Path("schemas").rglob("*.json"):
+              json.loads(p.read_text())
+              print("ok", p)
+          PY
+
+      - name: No fabricated numbers in the design corpus
+        run: |
+          PYTHONPATH=$PWD/python .venv/bin/python - <<'PY'
+          import pathlib, sys
+          # A results table must never be committed to docs: figures and numbers
+          # come from results/, generated from raw data.
+          bad = []
+          for p in pathlib.Path("docs").rglob("*.md"):
+              text = p.read_text(encoding="utf-8")
+              if "GFLOP/s" in text and "NOT YET MEASURED" not in text:
+                  bad.append(str(p))
+          if bad:
+              print("performance figures found in docs without a provenance marker:", bad)
+              sys.exit(1)
+          print("clean")
+          PY
+
+  cuda-build:
+    # Compiles CUDA sources without a GPU, so a syntax or API error is caught at
+    # PR time rather than on the next nightly GPU run. No CUDA sources exist yet;
+    # this job activates in week 5.
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "activates when cpp/backends/cuda/ has sources (week 5)"
