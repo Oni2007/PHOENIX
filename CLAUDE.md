@@ -90,7 +90,9 @@ C++20 / Python 3.11 / CUDA 12.x / CMake ≥ 3.24 / nanobind / GoogleTest / pytes
 - **CUDA work requires a physical NVIDIA GPU.** None is present. Weeks 1–4 are deliberately GPU-free so development is not blocked by hardware availability.
 - **Which GPU PHOENIX will run on is still undecided** (TDD §37 item 1). It determines compute capability, available precisions, `CMAKE_CUDA_ARCHITECTURES`, and EXP-006's dtype coverage. Needed by Week 4.
 - **Do not put the working tree in a cloud-synced folder.** TDD §10 requires read-only checksummed directories under `results/`; sync clients fight that, and build trees thrash them.
-- **The tree currently lives on the Windows filesystem** (`C:\Users\Bruker\PHOENIX`, i.e. `/mnt/c/Users/Bruker/PHOENIX` from WSL2). That is fine while the repository is documents only. **Before Week 1's first build, move it onto the WSL2 filesystem** (e.g. `~/PHOENIX`): building across `/mnt/c` is slow, and its file-metadata semantics are not the ones §10's read-only immutability enforcement assumes. Clone or `git mv` — do not run a build in place.
+- **The working tree is `C:\Users\Bruker\OneDrive\PHOENIX`** — `/mnt/c/Users/Bruker/OneDrive/PHOENIX` from WSL2. This is the single canonical location; there is no other copy.
+- **The build tree and virtualenv are deliberately OUTSIDE it**, at `~/.phoenix/build` and `~/.phoenix/venv`. Never create `build/` or `.venv/` inside the repository — a sync client rewriting a build directory mid-compile is a real failure mode, and Linux ELF binaries do not belong in cloud storage.
+- **Sealed packages are not write-protected here.** `chmod` is silently discarded by the Windows drive mount; every file reads as 0777 (measured). Immutability rests on BLAKE3 checksums alone, so **`verify()` before any analysis is mandatory, not advisory** (ADR-035).
 - Verify the CUDA toolkit and driver versions against NVIDIA's current release rather than trusting the TDD's `⚠`-marked pins.
 - AMD/ROCm and TPU are interface-only in v0.1. Do not claim support for hardware that has never executed a run.
 

@@ -686,6 +686,8 @@ Note `dtype_a/b/c/compute` are four separate fields. Mixed-precision GEMM has an
 
 ### 10.6 Immutability enforcement
 
+**Platform caveat (ADR-035):** on a cloud-synced Windows drive mounted into WSL2, `chmod` is silently discarded and every file reads as 0777 — measured, not assumed. On such a host the read-only mechanism below does not exist and immutability rests on checksums alone, which makes `verify()` mandatory before any analysis.
+
 On write: files closed, BLAKE3 checksummed, directory made read-only, `MANIFEST.json` written containing every file's checksum. On ingest: checksums verified; a mismatch marks the run `TAMPERED` and excludes it from all analysis. Corrections are new runs with `supersedes: <run_id>`.
 
 ---
@@ -1754,6 +1756,7 @@ Four distinct lines/points, **visually distinguished by provenance class**:
 | ADR-032 | **The development host is not a measurement host.** Runs from it are `PROVISIONAL` and unpublishable | **Accepted — blocking** | Hybrid P/E cores (R-19), WSL2 virtualisation (R-20), and a laptop thermal envelope (R-21) each independently violate §32's validity criteria. Executing EXP-001 here validates the pipeline; it does not measure a CPU. | A controlled measurement host is provisioned and characterised |
 | ADR-033 | Project interpreter pinned by `uv` independently of the system Python | Accepted | System Python in WSL2 is 3.14.4, above §5's tested range; pinning decouples the project from distro drift | §5's tested range is extended after validation |
 | ADR-034 | GEMM correctness scales error by `(\|A\|·\|B\|)`, not `\|C\|`; `C` unchanged | Accepted | Dividing by `\|C\|` measures cancellation in the input data, not implementation error; found by EXP-001's first execution | Mixed-precision accumulate paths (EXP-006) |
+| ADR-035 | Working tree on a cloud-synced drive; build/venv outside it | Accepted | Immutability there is checksum-only: `chmod` is discarded by DrvFs (measured). `verify()` becomes mandatory, not advisory | A controlled measurement host exists |
 
 ---
 

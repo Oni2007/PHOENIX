@@ -105,13 +105,19 @@ because no characterised power source exists on this host (ADR-024).
 
 From inside WSL2:
 
+From inside WSL2, at `/mnt/c/Users/Bruker/OneDrive/PHOENIX`:
+
 ```bash
-source .venv/bin/activate
-export PYTHONPATH=$PWD/python:$PWD/build
+source ~/.phoenix/venv/bin/activate
+export PHOENIX_BUILD_DIR=~/.phoenix/build PYTHONPATH=$PWD/python:~/.phoenix/build
+make build && make test
 python -m phoenix.cli.main discover
 python -m phoenix.cli.main run experiments/EXP-001_cpu_reference_gemm/config.yaml
 python -m phoenix.cli.main report EXP-001
 ```
+
+The build tree and virtualenv live at `~/.phoenix/`, outside the synced folder, on
+purpose — see [ADR-035](docs/adr/ADR-035-cloud-synced-working-tree.md).
 
 ## Repository layout
 
