@@ -1,0 +1,362 @@
+# ══════════════════════════════════════════════════════════════════════════
+# PURELY THEORETICAL. PHOENIX HAS NEVER EXECUTED ON THIS DEVICE.
+#
+# Every number below is VENDOR_REPORTED, sourced from NVIDIA's own published
+# specifications, NOT measured by PHOENIX. No H100 exists in this project's
+# environment (verified: no nvidia-smi, no nvcc, no discrete GPU — see
+# ADR-032 and TDD §37 item 1). This record exists to support ANALYTICAL
+# roofline modelling only (TDD §33) — computing what a workload's theoretical
+# ceiling WOULD be against a real chip's published specs. It is not, and must
+# never be presented as, a benchmark result, a measurement, or evidence that
+# PHOENIX runs on NVIDIA hardware.
+# ══════════════════════════════════════════════════════════════════════════
+#
+# Sourcing note: NVIDIA's own datasheet/whitepaper PDFs could not be parsed by
+# this session's tooling (binary/compressed PDF streams; no poppler-utils and
+# no root to install it — see ADR-036 for the same limitation elsewhere in
+# this project). Every figure below was instead cross-checked across at least
+# two independent secondary sources that transcribe NVIDIA's own published
+# numbers (Wikipedia's Hopper microarchitecture page, itcreations.com's
+# NVIDIA H100 SXM5 product page, and a general web search summarising
+# NVIDIA's resources.nvidia.com datasheet). Where two sources agreed on a
+# rounded figure, confidence is MEDIUM. Where NVIDIA's own PDF would give more
+# decimal precision than was confirmed this session, the rounded figure is
+# used rather than a remembered, unverified decimal.
+schema_version: "1.0.0"
+id: "nvidia-h100-sxm5-80gb"
+record_revision: 1
+device_class: GPU
+
+identity:
+  vendor: NVIDIA
+  model: "H100 SXM5 80GB"
+  family: "H100"
+  architecture: "Hopper"
+  microarchitecture: "GH100"
+  form_factor: "SXM5"
+  release_year:
+    value: 2022
+    unit: "year"
+    provenance: VENDOR_REPORTED
+    source:
+      citation: "Cross-checked general knowledge of the Hopper architecture launch (GTC 2022); not independently re-verified via search this session"
+    confidence: MEDIUM
+
+compute:
+  units:
+    - kind: "SM"
+      count:
+        value: 132
+        unit: "count"
+        provenance: VENDOR_REPORTED
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture), itcreations.com H100 SXM5 product page"
+          accessed: "2026-08-20"
+        confidence: HIGH
+    - kind: "CUDA core (FP32)"
+      count:
+        value: 16896
+        unit: "count"
+        provenance: VENDOR_REPORTED
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture): 132 SM x 128 FP32 cores/SM"
+          accessed: "2026-08-20"
+        confidence: HIGH
+    - kind: "CUDA core (FP64)"
+      count:
+        value: 4608
+        unit: "count"
+        provenance: VENDOR_REPORTED
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture)"
+          accessed: "2026-08-20"
+        notes: "Not independently cross-checked against a second source this session -- MEDIUM confidence, not HIGH."
+        confidence: MEDIUM
+    - kind: "Tensor Core"
+      generation: "4th generation"
+      count:
+        value: 528
+        unit: "count"
+        provenance: VENDOR_REPORTED
+        source:
+          citation: "general web search summary of NVIDIA H100 specifications (132 SM x 4 Tensor Cores/SM)"
+          accessed: "2026-08-20"
+        confidence: MEDIUM
+  clocks:
+    base_mhz:
+      value: null
+      unit: "MHz"
+      provenance: VENDOR_REPORTED
+      notes: "NOT VERIFIED this session -- not entered from memory. UNKNOWN pending a primary-source check."
+      confidence: LOW
+    boost_mhz:
+      value: 1980
+      unit: "MHz"
+      provenance: VENDOR_REPORTED
+      source:
+        citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture)"
+        accessed: "2026-08-20"
+      confidence: HIGH
+  precisions:
+    - name: "FP64"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 34.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "non-Tensor-Core CUDA-core FP64 path, boost clock, dense (structured sparsity is not applicable to this path)"
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture); itcreations.com H100 SXM5 product page (both agree: 34 TFLOPS)"
+          accessed: "2026-08-20"
+        confidence: HIGH
+    - name: "FP64_TENSOR_CORE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 67.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core FP64 matrix path, boost clock, dense (NVIDIA does not market a structured-sparsity variant for FP64 Tensor Core)"
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture); itcreations.com (both agree: 67 TFLOPS)"
+          accessed: "2026-08-20"
+        confidence: HIGH
+    - name: "FP32"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 67.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "non-Tensor-Core CUDA-core FP32 path, boost clock"
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture); itcreations.com (both agree: 67 TFLOPS)"
+          accessed: "2026-08-20"
+        confidence: HIGH
+    - name: "TF32_TENSOR_CORE_DENSE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 495.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core TF32 path, dense (NO structured sparsity), boost clock"
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture): 'TF32 dense tensor: 495 TFLOPS'"
+          accessed: "2026-08-20"
+        notes: "A second source (itcreations.com) reports 989 TFLOPS for what it labels 'FP32 Tensor Core' -- interpreted here as the WITH-sparsity figure for the same TF32 path (989 is ~2x 495, matching the standard 2:4 structured-sparsity doubling seen consistently across every other precision in this record). Not independently confirmed against NVIDIA's own PDF text this session."
+        confidence: MEDIUM
+    - name: "TF32_TENSOR_CORE_SPARSE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 989.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core TF32 path, WITH 2:4 structured sparsity (~2x the dense figure), boost clock"
+        source:
+          citation: "itcreations.com H100 SXM5 product page (labelled 'FP32 Tensor Core: 989 teraFLOPS'; reinterpreted as TF32-with-sparsity per NVIDIA's own naming convention)"
+          accessed: "2026-08-20"
+        notes: "See TF32_TENSOR_CORE_DENSE notes on the dense/sparse interpretation."
+        confidence: MEDIUM
+    - name: "BF16_TENSOR_CORE_DENSE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 990.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core BF16 path, dense (no sparsity), boost clock"
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture): 'BF16 dense tensor: 990 TFLOPS'"
+          accessed: "2026-08-20"
+        confidence: HIGH
+    - name: "BF16_TENSOR_CORE_SPARSE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 1979.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core BF16 path, WITH 2:4 structured sparsity (2x dense), boost clock"
+        source:
+          citation: "itcreations.com (labelled 'BFLOAT16 Tensor Core: 1,979 teraFLOPS'); consistent with 2x the Wikipedia-sourced dense figure of 990"
+          accessed: "2026-08-20"
+        confidence: MEDIUM
+    - name: "FP16_TENSOR_CORE_DENSE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 990.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core FP16 path, dense (no sparsity), boost clock"
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture): 'FP16 dense tensor: 990 TFLOPS'"
+          accessed: "2026-08-20"
+        confidence: HIGH
+    - name: "FP16_TENSOR_CORE_SPARSE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 1979.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core FP16 path, WITH 2:4 structured sparsity (2x dense), boost clock"
+        source:
+          citation: "itcreations.com (labelled 'FP16 Tensor Core: 1,979 teraFLOPS'); general web search summary also states 989 TFLOPS as a headline FP16 figure, matching the DENSE value -- the two secondary sources are internally consistent with each other on the dense/sparse split"
+          accessed: "2026-08-20"
+        confidence: MEDIUM
+    - name: "FP8_TENSOR_CORE_DENSE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 1979.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core FP8 path (E4M3/E5M2), dense (no sparsity), boost clock"
+        source:
+          citation: "general web search summary: '1979 TFLOPS for FP8 precision'; consistent with half of itcreations.com's 3,958 TFLOPS figure"
+          accessed: "2026-08-20"
+        confidence: MEDIUM
+    - name: "FP8_TENSOR_CORE_SPARSE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 3958.0
+        unit: "TFLOP/s"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core FP8 path, WITH 2:4 structured sparsity (2x dense), boost clock"
+        source:
+          citation: "itcreations.com H100 SXM5 product page: 'FP8 Tensor Core: 3,958 teraFLOPS'"
+          accessed: "2026-08-20"
+        confidence: MEDIUM
+    - name: "INT8_TENSOR_CORE_DENSE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 1979.0
+        unit: "TOPS"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core INT8 path, dense (no sparsity), boost clock"
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture): 'INT8 dense tensor: 1.98 POPS' (=1980 TOPS, rounds to the same figure as the FP8 dense path)"
+          accessed: "2026-08-20"
+        confidence: HIGH
+    - name: "INT8_TENSOR_CORE_SPARSE"
+      supported: true
+      native_or_emulated: "NATIVE"
+      peak:
+        value: 3958.0
+        unit: "TOPS"
+        provenance: VENDOR_REPORTED
+        conditions: "4th-gen Tensor Core INT8 path, WITH 2:4 structured sparsity (2x dense), boost clock"
+        source:
+          citation: "itcreations.com H100 SXM5 product page: 'INT8 Tensor Core: 3,958 TOPS'"
+          accessed: "2026-08-20"
+        confidence: MEDIUM
+
+memory:
+  levels:
+    - level: "L2"
+      technology: null
+      capacity:
+        value: 50.0
+        unit: "MiB"
+        provenance: VENDOR_REPORTED
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture): 'L2 cache: 51200 KB' (=50 MiB)"
+          accessed: "2026-08-20"
+        confidence: HIGH
+    - level: "Device memory"
+      technology: "HBM3"
+      capacity:
+        value: 80.0
+        unit: "GiB"
+        provenance: VENDOR_REPORTED
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture); itcreations.com; general web search (all three agree: 80 GB)"
+          accessed: "2026-08-20"
+        confidence: HIGH
+      bandwidth:
+        value: 3.35
+        unit: "TB/s"
+        provenance: VENDOR_REPORTED
+        conditions: "theoretical peak HBM3 bandwidth, SXM5 module"
+        source:
+          citation: "general web search summary of NVIDIA's own datasheet: 'approximately 3.35 TB/s'"
+          accessed: "2026-08-20"
+        notes: "itcreations.com rounds this to 3.5 TB/s. 3.35 TB/s is used here as the more precise figure, consistent with NVIDIA's commonly-cited official number, but the source is a secondary summary, not NVIDIA's own PDF text directly -- hence MEDIUM, not HIGH, confidence."
+        confidence: MEDIUM
+      bandwidth_attained:
+        value: null
+        unit: "TB/s"
+        provenance: MEASURED
+        notes: "NOT YET MEASURED. No H100 has ever been available to this project. There is no bandwidth microbenchmark result for this device and there cannot be one until real hardware access exists (TDD 37 item 1)."
+
+interconnect:
+  host:
+    kind: "PCIe"
+    generation: "Gen5"
+    bandwidth:
+      value: 128.0
+      unit: "GB/s"
+      provenance: VENDOR_REPORTED
+      conditions: "PCIe Gen5 x16, bidirectional aggregate"
+      source:
+        citation: "itcreations.com H100 SXM5 product page: 'PCIe Gen5 (128GB/s)'"
+        accessed: "2026-08-20"
+      confidence: MEDIUM
+  device_to_device:
+    - kind: "NVLink"
+      generation: "4th generation"
+      bandwidth:
+        value: 900.0
+        unit: "GB/s"
+        provenance: VENDOR_REPORTED
+        conditions: "aggregate bidirectional NVLink bandwidth per GPU, SXM5 module in an NVLink-connected system"
+        source:
+          citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture): 'NVLink interconnect: 0.9 TB/s'; itcreations.com: 'NVLink Bandwidth: 900GB/s' (both agree)"
+          accessed: "2026-08-20"
+        confidence: HIGH
+      topology_notes: "Requires an NVLink-connected system (e.g. HGX baseboard); a single PCIe-hosted SXM5 module without NVLink partners cannot attain this figure."
+
+power:
+  tdp:
+    value: 700.0
+    unit: "W"
+    provenance: VENDOR_REPORTED
+    source:
+      citation: "en.wikipedia.org/wiki/Hopper_(microarchitecture); itcreations.com (both agree: 700W, itcreations notes 'configurable')"
+      accessed: "2026-08-20"
+    confidence: HIGH
+  idle_typical:
+    value: null
+    unit: "W"
+    provenance: MEASURED
+    notes: "NOT YET MEASURED -- no hardware access."
+  telemetry_available: null
+  telemetry_mechanism: "NVML (per TDD §12.2, if/when real hardware access exists)"
+  telemetry_semantics: "NOT CHARACTERISED -- no hardware access. Per ADR-024, no energy figure derived from this device may ship until NVML's actual sampling behaviour is characterised against an external meter, which requires physical hardware."
+
+software:
+  runtime: "CUDA"
+  isa: null
+  compute_capability: "9.0"
+  compilers:
+    - "nvcc"
+  vendor_math_libraries:
+    - "cuBLAS"
+    - "cuBLASLt"
+
+measurement_host_qualified:
+  value: false
+  provenance: MEASURED
+  notes: "This device has never been present in this project's environment. Not a measurement host because it is not a host at all -- there is no physical unit to measure. Distinct from ADR-032, which concerns a real, present-but-disqualified CPU host; this is the stronger case of a device that does not exist here in any form."
+
+provenance_summary:
+  authored_by: "Claude (vendor-spec sourcing pass, explicitly requested as theoretical-only by the user)"
+  reviewed_by: null
+  last_verified: "2026-08-20"
+  overall_confidence: MEDIUM

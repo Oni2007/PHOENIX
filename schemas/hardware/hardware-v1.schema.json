@@ -1,5 +1,93 @@
 {
   "$defs": {
+    "Clocks": {
+      "additionalProperties": false,
+      "properties": {
+        "base_mhz": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProvenanceValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "boost_mhz": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProvenanceValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "Clocks",
+      "type": "object"
+    },
+    "Compute": {
+      "additionalProperties": false,
+      "properties": {
+        "clocks": {
+          "$ref": "#/$defs/Clocks",
+          "default": {
+            "base_mhz": null,
+            "boost_mhz": null
+          }
+        },
+        "precisions": {
+          "items": {
+            "$ref": "#/$defs/Precision"
+          },
+          "title": "Precisions",
+          "type": "array"
+        },
+        "units": {
+          "items": {
+            "$ref": "#/$defs/ComputeUnit"
+          },
+          "title": "Units",
+          "type": "array"
+        }
+      },
+      "title": "Compute",
+      "type": "object"
+    },
+    "ComputeUnit": {
+      "additionalProperties": false,
+      "description": "Deliberately generic: an SM, a CU, an MXU, and an MZI mesh have nothing\nstructurally in common, so this is a list of typed records, not fixed keys\n(TDD \u00a79.3) \u2014 the same shape describes every future backend, not just GPUs.",
+      "properties": {
+        "count": {
+          "$ref": "#/$defs/ProvenanceValue"
+        },
+        "generation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Generation"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "count"
+      ],
+      "title": "ComputeUnit",
+      "type": "object"
+    },
     "Confidence": {
       "enum": [
         "HIGH",
@@ -64,6 +152,24 @@
           "title": "Model",
           "type": "string"
         },
+        "product_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Product Codes",
+          "type": "array"
+        },
+        "release_year": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProvenanceValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "vendor": {
           "title": "Vendor",
           "type": "string"
@@ -75,6 +181,386 @@
       ],
       "title": "Identity",
       "type": "object"
+    },
+    "Interconnect": {
+      "additionalProperties": false,
+      "properties": {
+        "device_to_device": {
+          "items": {
+            "$ref": "#/$defs/InterconnectLink"
+          },
+          "title": "Device To Device",
+          "type": "array"
+        },
+        "host": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InterconnectLink"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "Interconnect",
+      "type": "object"
+    },
+    "InterconnectLink": {
+      "additionalProperties": false,
+      "properties": {
+        "bandwidth": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PeakComputeValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "generation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Generation"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "lanes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lanes"
+        },
+        "topology_notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Topology Notes"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "InterconnectLink",
+      "type": "object"
+    },
+    "Memory": {
+      "additionalProperties": false,
+      "properties": {
+        "levels": {
+          "items": {
+            "$ref": "#/$defs/MemoryLevel"
+          },
+          "title": "Levels",
+          "type": "array"
+        }
+      },
+      "title": "Memory",
+      "type": "object"
+    },
+    "MemoryLevel": {
+      "additionalProperties": false,
+      "properties": {
+        "bandwidth": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PeakComputeValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "bandwidth_attained": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProvenanceValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capacity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProvenanceValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "configurable": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Configurable"
+        },
+        "level": {
+          "title": "Level",
+          "type": "string"
+        },
+        "technology": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Technology"
+        }
+      },
+      "required": [
+        "level"
+      ],
+      "title": "MemoryLevel",
+      "type": "object"
+    },
+    "PeakComputeValue": {
+      "additionalProperties": false,
+      "description": "A peak throughput/bandwidth figure (TDD \u00a79.1).\n\n'conditions is mandatory on all peak-compute fields... the schema rejects a\npeak-compute entry lacking conditions.' A peak FLOP/s figure without stated\nconditions (sparsity on/off, boost vs base clock, which precision mode) is\nthe single most common source of dishonest accelerator comparisons. This is\nthe one line in the TDD that is worth enforcing by type rather than review.",
+      "properties": {
+        "conditions": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Conditions"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Confidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Source"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "provenance"
+      ],
+      "title": "PeakComputeValue",
+      "type": "object"
+    },
+    "Power": {
+      "additionalProperties": false,
+      "properties": {
+        "idle_typical": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProvenanceValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "tdp": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProvenanceValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "telemetry_available": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Telemetry Available"
+        },
+        "telemetry_mechanism": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Telemetry Mechanism"
+        },
+        "telemetry_semantics": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Telemetry Semantics"
+        }
+      },
+      "title": "Power",
+      "type": "object"
+    },
+    "Precision": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "native_or_emulated": {
+          "anyOf": [
+            {
+              "enum": [
+                "NATIVE",
+                "EMULATED"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Native Or Emulated"
+        },
+        "peak": {
+          "$ref": "#/$defs/PeakComputeValue"
+        },
+        "supported": {
+          "title": "Supported",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "supported",
+        "peak"
+      ],
+      "title": "Precision",
+      "type": "object"
+    },
+    "Provenance": {
+      "enum": [
+        "MEASURED",
+        "VENDOR_REPORTED",
+        "SIMULATED",
+        "ANALYTICAL",
+        "HYPOTHETICAL",
+        "DERIVED"
+      ],
+      "title": "Provenance",
+      "type": "string"
     },
     "ProvenanceSummary": {
       "additionalProperties": false,
@@ -110,17 +596,261 @@
       ],
       "title": "ProvenanceSummary",
       "type": "object"
+    },
+    "ProvenanceValue": {
+      "additionalProperties": false,
+      "description": "A number that cannot exist without a provenance class.\n\n`value=None` means UNKNOWN / NOT YET MEASURED, and it is a legal, first-class\nstate precisely so nobody is pressured into inventing a number to satisfy a\nrequired field.",
+      "properties": {
+        "conditions": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Conditions"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Confidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Source"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "provenance"
+      ],
+      "title": "ProvenanceValue",
+      "type": "object"
+    },
+    "Software": {
+      "additionalProperties": false,
+      "properties": {
+        "compilers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Compilers",
+          "type": "array"
+        },
+        "compute_capability": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Compute Capability"
+        },
+        "isa": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Isa"
+        },
+        "runtime": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Runtime"
+        },
+        "vendor_math_libraries": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Vendor Math Libraries",
+          "type": "array"
+        }
+      },
+      "title": "Software",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "accessed": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Accessed"
+        },
+        "citation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Citation"
+        },
+        "experiment_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Experiment Id"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page"
+        },
+        "run_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Run Id"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        }
+      },
+      "title": "Source",
+      "type": "object"
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "compute": {
-      "additionalProperties": true,
-      "title": "Compute",
-      "type": "object"
+      "$ref": "#/$defs/Compute",
+      "default": {
+        "clocks": {
+          "base_mhz": null,
+          "boost_mhz": null
+        },
+        "precisions": [],
+        "units": []
+      }
     },
     "device_class": {
+      "enum": [
+        "CPU",
+        "GPU",
+        "TPU",
+        "NPU",
+        "PHOTONIC",
+        "NEUROMORPHIC",
+        "OTHER_ACCELERATOR"
+      ],
       "title": "Device Class",
       "type": "string"
     },
@@ -131,15 +861,39 @@
     "identity": {
       "$ref": "#/$defs/Identity"
     },
+    "interconnect": {
+      "$ref": "#/$defs/Interconnect",
+      "default": {
+        "device_to_device": [],
+        "host": null
+      }
+    },
+    "measurement_host_qualified": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ProvenanceValue"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
     "memory": {
-      "additionalProperties": true,
-      "title": "Memory",
-      "type": "object"
+      "$ref": "#/$defs/Memory",
+      "default": {
+        "levels": []
+      }
     },
     "power": {
-      "additionalProperties": true,
-      "title": "Power",
-      "type": "object"
+      "$ref": "#/$defs/Power",
+      "default": {
+        "idle_typical": null,
+        "tdp": null,
+        "telemetry_available": null,
+        "telemetry_mechanism": null,
+        "telemetry_semantics": null
+      }
     },
     "provenance_summary": {
       "$ref": "#/$defs/ProvenanceSummary"
@@ -154,9 +908,14 @@
       "type": "string"
     },
     "software": {
-      "additionalProperties": true,
-      "title": "Software",
-      "type": "object"
+      "$ref": "#/$defs/Software",
+      "default": {
+        "compilers": [],
+        "compute_capability": null,
+        "isa": null,
+        "runtime": null,
+        "vendor_math_libraries": []
+      }
     }
   },
   "required": [
