@@ -1,0 +1,50 @@
+schema_version: 1.0.0
+paper_id: PAP-0030
+title: 'GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers'
+authors:
+- Elias Frantar
+- Saleh Ashkboos
+- Torsten Hoefler
+- Dan Alistarh
+year: 2023
+venue:
+  name: ICLR 2023
+  type: CONFERENCE
+  tier_notes: null
+identifiers:
+  doi: null
+  arxiv: '2210.17323'
+  url: null
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+categories:
+- transformer_acceleration
+hardware_studied: []
+methodology:
+  type: EXPERIMENTAL
+  measured_on_physical_hardware: true
+  simulator: null
+  workloads: []
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+claims: []
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix:
+  - Verified via a single WebSearch call this session; the call's own results included multiple corroborating
+    source links (e.g. dblp + arXiv + publisher page independently agreeing), which is weaker than the
+    deliberate dual-query cross-check used for PAP-0001..0006 and the H100 hardware record, but is genuine
+    multi-source corroboration, not recall from training memory.
+phoenix_relevance:
+  relevance: MEDIUM
+  informs_hypotheses: []
+  reproducible_by_phoenix: UNKNOWN
+  follow_up_experiments: []
+provenance:
+  added_by: Claude (batch literature-corpus growth pass)
+  added_on: '2026-08-20'
+  read_status: ABSTRACT_ONLY
+  verified_by: null

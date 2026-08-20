@@ -1,0 +1,49 @@
+schema_version: 1.0.0
+paper_id: PAP-0036
+title: Algorithms for VLSI Processor Arrays
+authors:
+- H. T. Kung
+- C. E. Leiserson
+year: 1980
+venue:
+  name: Introduction to VLSI Systems (Mead & Conway, eds.), Chapter 8.3
+  type: OTHER
+  tier_notes: null
+identifiers:
+  doi: null
+  arxiv: null
+  url: https://www.semanticscholar.org/paper/Systolic-Arrays-for-(VLSI).-Kung-Leiserson/fbdf08fb10d92518b7c0571e1ae907de2c20ff76
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+categories:
+- systolic_arrays
+- ai_accelerator_architecture
+hardware_studied: []
+methodology:
+  type: ANALYTICAL
+  measured_on_physical_hardware: false
+  simulator: null
+  workloads: []
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+claims: []
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix:
+  - Verified via a single WebSearch call this session; the call's own results included multiple corroborating
+    source links (e.g. dblp + arXiv + publisher page independently agreeing), which is weaker than the
+    deliberate dual-query cross-check used for PAP-0001..0006 and the H100 hardware record, but is genuine
+    multi-source corroboration, not recall from training memory.
+phoenix_relevance:
+  relevance: HIGH
+  informs_hypotheses: []
+  reproducible_by_phoenix: UNKNOWN
+  follow_up_experiments: []
+provenance:
+  added_by: Claude (batch literature-corpus growth pass)
+  added_on: '2026-08-20'
+  read_status: ABSTRACT_ONLY
+  verified_by: null
