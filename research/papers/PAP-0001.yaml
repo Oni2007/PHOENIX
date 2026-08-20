@@ -1,0 +1,109 @@
+schema_version: "1.0.0"
+paper_id: "PAP-0001"
+title: "In-Datacenter Performance Analysis of a Tensor Processing Unit"
+authors:
+  - "Norman P. Jouppi"
+  - "Cliff Young"
+  - "Nishant Patil"
+  - "David Patterson"
+  - "(et al., Google, Inc.)"
+year: 2017
+venue:
+  name: "ISCA '17 (44th Annual International Symposium on Computer Architecture)"
+  type: CONFERENCE
+identifiers:
+  doi: "10.1145/3079856.3080246"
+  arxiv: "1704.04760"
+  url: "https://arxiv.org/abs/1704.04760"
+
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+
+categories:
+  - tpu_ai_accelerators
+  - ai_accelerator_architecture
+  - systolic_arrays
+  - benchmarking_methodology
+
+hardware_studied:
+  - kind: TPU
+    description: "Tensor Processing Unit v1: a datacenter inference ASIC built around a 65,536 8-bit MAC systolic-array matrix multiply unit, deployed in Google datacenters since 2015."
+    fabrication: "custom ASIC (process node not extracted at this review depth)"
+    scale: "single chip, deployed at datacenter scale"
+
+methodology:
+  type: EXPERIMENTAL
+  measured_on_physical_hardware: true
+  simulator: null
+  workloads:
+    - "production NN inference: MLPs, CNNs, LSTMs (TensorFlow), reported as ~95% of the authors' datacenters' NN inference demand"
+  precision: "8-bit (int8 MAC array)"
+  baseline_compared_against: "contemporaneous Intel Haswell CPU and Nvidia K80 GPU, in the same server class"
+  baseline_fairness_assessment: |
+    Not yet assessed at this review depth (SKIMMED, not FULL_READ). The paper does
+    report both "Total" (including host server power) and "Incremental"
+    (accelerator-only) performance-per-watt separately (per Figure 9's caption,
+    found via search rather than full-text review) -- this is exactly the kind of
+    distinction PHOENIX's own comparability policy (TDD §18) requires, and it is
+    NOT YET DETERMINED here which scope the paper's headline 30x-80x figure uses.
+    Flagged as an open question in claim PAP-0001-C3 below rather than guessed at.
+
+claims:
+  - claim_id: "PAP-0001-C1"
+    statement: "The TPU's matrix multiply unit offers a peak throughput of 92 TeraOps/second (TOPS)."
+    quantity: {name: "peak int8 throughput", value: 92.0, unit: "TOPS"}
+    evidence_class: ANALYTICAL
+    scope: "peak throughput of the 65,536-MAC systolic array only, int8 precision, on production TPU v1 silicon -- a design-computed figure (MAC count x clock x 2), not a workload benchmark"
+    excludes:
+      - "host CPU, PCIe transfer, DRAM/HBM, and control-logic power or latency"
+      - "any workload-achieved (as opposed to design-peak) figure"
+    uncertainty_reported: false
+    confidence_in_claim: HIGH
+
+  - claim_id: "PAP-0001-C2"
+    statement: "The TPU is reported as on average about 15x-30x faster than contemporary GPU or CPU on the authors' production inference workload mix."
+    evidence_class: MEASURED
+    scope: "aggregate speedup across Google's production inference workloads (MLPs, CNNs, LSTMs), TPU v1 vs contemporaneous Haswell CPU and Nvidia K80 GPU, as deployed in Google datacenters, verbatim from the paper's abstract"
+    excludes:
+      - "training workloads (TPU v1 is described as inference-only, so this cannot describe training)"
+      - "does not represent a peak/theoretical figure -- this is an aggregate empirical average across a workload mix, not a single-kernel benchmark"
+    uncertainty_reported: false
+    confidence_in_claim: HIGH
+
+  - claim_id: "PAP-0001-C3"
+    statement: "The TPU's TOPS/Watt is reported as about 30x-80x higher than contemporary GPU or CPU."
+    evidence_class: MEASURED
+    scope: "same production-inference comparison as PAP-0001-C2"
+    excludes:
+      - "UNRESOLVED AT THIS REVIEW DEPTH: the paper separately reports 'Total' performance/Watt (including host server power) and 'Incremental' performance/Watt (accelerator chip only, per Figure 9's caption). Which of these two scopes the abstract's headline 30x-80x figure refers to was not determined here -- a genuine open question, recorded rather than resolved by assumption. Requires a FULL_READ pass on Figure 9 and its surrounding text before this claim can be cited with a specific scope."
+    uncertainty_reported: true
+    confidence_in_claim: MEDIUM
+
+  - claim_id: "PAP-0001-C4"
+    statement: "The paper projects that using the GPU's GDDR5-class memory in a TPU would triple achieved TOPS and raise TOPS/Watt to nearly 70x the GPU and 200x the CPU."
+    evidence_class: PROJECTED
+    scope: "a hypothetical TPU memory configuration explicitly not the deployed/measured TPU v1 (which uses DDR3)"
+    excludes:
+      - "not achieved on real, deployed hardware -- this is the paper authors' own extrapolation, stated as such in the abstract"
+    uncertainty_reported: false
+    confidence_in_claim: HIGH
+
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix:
+    - "This review has not yet reached FULL_READ depth; Figure 9's Total-vs-Incremental power scope (see PAP-0001-C3) needs resolving before the TOPS/Watt claim can be cited with a specific, defensible scope."
+
+phoenix_relevance:
+  relevance: HIGH
+  informs_hypotheses: []
+  reproducible_by_phoenix: "NO"
+  follow_up_experiments:
+    - "EXP-010"
+
+provenance:
+  added_by: "Claude (automated literature-extraction pass)"
+  added_on: "2026-08-20"
+  read_status: SKIMMED
+  verified_by: null

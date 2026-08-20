@@ -1,0 +1,593 @@
+{
+  "$defs": {
+    "Artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Code"
+        },
+        "data": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data"
+        },
+        "reproducible": {
+          "$ref": "#/$defs/ReproducibleStatus",
+          "default": "UNKNOWN"
+        }
+      },
+      "title": "Artifacts",
+      "type": "object"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "confidence_in_claim": {
+          "$ref": "#/$defs/Confidence"
+        },
+        "evidence_class": {
+          "$ref": "#/$defs/EvidenceClass"
+        },
+        "excludes": {
+          "description": "what this number does NOT include",
+          "items": {
+            "type": "string"
+          },
+          "title": "Excludes",
+          "type": "array"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "scope": {
+          "description": "what this number DOES include",
+          "minLength": 1,
+          "title": "Scope",
+          "type": "string"
+        },
+        "statement": {
+          "title": "Statement",
+          "type": "string"
+        },
+        "uncertainty_reported": {
+          "default": false,
+          "title": "Uncertainty Reported",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "claim_id",
+        "statement",
+        "evidence_class",
+        "scope",
+        "confidence_in_claim"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "Confidence": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ],
+      "title": "Confidence",
+      "type": "string"
+    },
+    "EvidenceClass": {
+      "description": "A paper's own evidence class \u2014 deliberately not PHOENIX's Provenance enum.\n\nA claim extracted from a paper is evidence *about* something PHOENIX did not\nitself measure. PHOENIX's own Provenance enum (MEASURED/VENDOR_REPORTED/...)\ndescribes PHOENIX's data; this describes the paper's. PROJECTED is meaningful\nhere (a paper's own extrapolation) and has no PHOENIX-side equivalent.",
+      "enum": [
+        "MEASURED",
+        "SIMULATED",
+        "ANALYTICAL",
+        "PROJECTED"
+      ],
+      "title": "EvidenceClass",
+      "type": "string"
+    },
+    "HardwareStudied": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "fabrication": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fabrication"
+        },
+        "kind": {
+          "enum": [
+            "CPU",
+            "GPU",
+            "TPU",
+            "NPU",
+            "PHOTONIC",
+            "NEUROMORPHIC",
+            "OTHER_ACCELERATOR"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "scale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scale"
+        }
+      },
+      "required": [
+        "kind",
+        "description"
+      ],
+      "title": "HardwareStudied",
+      "type": "object"
+    },
+    "Identifiers": {
+      "additionalProperties": false,
+      "properties": {
+        "arxiv": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Arxiv"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        }
+      },
+      "title": "Identifiers",
+      "type": "object"
+    },
+    "Limitations": {
+      "additionalProperties": false,
+      "properties": {
+        "identified_by_phoenix": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Identified By Phoenix",
+          "type": "array"
+        },
+        "stated_by_authors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Stated By Authors",
+          "type": "array"
+        }
+      },
+      "title": "Limitations",
+      "type": "object"
+    },
+    "Methodology": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_compared_against": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseline Compared Against"
+        },
+        "baseline_fairness_assessment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseline Fairness Assessment"
+        },
+        "measured_on_physical_hardware": {
+          "title": "Measured On Physical Hardware",
+          "type": "boolean"
+        },
+        "precision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Precision"
+        },
+        "simulator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Simulator"
+        },
+        "type": {
+          "$ref": "#/$defs/MethodologyType"
+        },
+        "workloads": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Workloads",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "measured_on_physical_hardware"
+      ],
+      "title": "Methodology",
+      "type": "object"
+    },
+    "MethodologyType": {
+      "enum": [
+        "EXPERIMENTAL",
+        "SIMULATION",
+        "ANALYTICAL",
+        "SURVEY"
+      ],
+      "title": "MethodologyType",
+      "type": "string"
+    },
+    "PaperProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "added_by": {
+          "title": "Added By",
+          "type": "string"
+        },
+        "added_on": {
+          "title": "Added On",
+          "type": "string"
+        },
+        "read_status": {
+          "$ref": "#/$defs/ReadStatus"
+        },
+        "verified_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verified By"
+        }
+      },
+      "required": [
+        "added_by",
+        "added_on",
+        "read_status"
+      ],
+      "title": "PaperProvenance",
+      "type": "object"
+    },
+    "PhoenixRelevance": {
+      "additionalProperties": false,
+      "properties": {
+        "follow_up_experiments": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Follow Up Experiments",
+          "type": "array"
+        },
+        "informs_hypotheses": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Informs Hypotheses",
+          "type": "array"
+        },
+        "relevance": {
+          "$ref": "#/$defs/Relevance"
+        },
+        "reproducible_by_phoenix": {
+          "$ref": "#/$defs/ReproducibleStatus",
+          "default": "UNKNOWN"
+        }
+      },
+      "required": [
+        "relevance"
+      ],
+      "title": "PhoenixRelevance",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "ReadStatus": {
+      "enum": [
+        "FULL_READ",
+        "SKIMMED",
+        "ABSTRACT_ONLY"
+      ],
+      "title": "ReadStatus",
+      "type": "string"
+    },
+    "Relevance": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ],
+      "title": "Relevance",
+      "type": "string"
+    },
+    "ReproducibleStatus": {
+      "enum": [
+        "YES",
+        "PARTIAL",
+        "NO",
+        "UNKNOWN"
+      ],
+      "title": "ReproducibleStatus",
+      "type": "string"
+    },
+    "Venue": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "tier_notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tier Notes"
+        },
+        "type": {
+          "$ref": "#/$defs/VenueType"
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ],
+      "title": "Venue",
+      "type": "object"
+    },
+    "VenueType": {
+      "enum": [
+        "CONFERENCE",
+        "JOURNAL",
+        "WORKSHOP",
+        "PREPRINT",
+        "WHITEPAPER",
+        "OTHER"
+      ],
+      "title": "VenueType",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One paper. One YAML file. Schema-validated, not free text (TDD \u00a724).",
+  "properties": {
+    "artifacts": {
+      "$ref": "#/$defs/Artifacts",
+      "default": {
+        "code": null,
+        "data": null,
+        "reproducible": "UNKNOWN"
+      }
+    },
+    "authors": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Authors",
+      "type": "array"
+    },
+    "categories": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Categories",
+      "type": "array"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "hardware_studied": {
+      "items": {
+        "$ref": "#/$defs/HardwareStudied"
+      },
+      "title": "Hardware Studied",
+      "type": "array"
+    },
+    "identifiers": {
+      "$ref": "#/$defs/Identifiers"
+    },
+    "limitations": {
+      "$ref": "#/$defs/Limitations",
+      "default": {
+        "identified_by_phoenix": [],
+        "stated_by_authors": []
+      }
+    },
+    "methodology": {
+      "$ref": "#/$defs/Methodology"
+    },
+    "paper_id": {
+      "pattern": "^PAP-\\d{4}$",
+      "title": "Paper Id",
+      "type": "string"
+    },
+    "phoenix_relevance": {
+      "$ref": "#/$defs/PhoenixRelevance"
+    },
+    "provenance": {
+      "$ref": "#/$defs/PaperProvenance"
+    },
+    "schema_version": {
+      "const": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "venue": {
+      "$ref": "#/$defs/Venue"
+    },
+    "year": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Year"
+    }
+  },
+  "required": [
+    "schema_version",
+    "paper_id",
+    "title",
+    "authors",
+    "venue",
+    "identifiers",
+    "methodology",
+    "phoenix_relevance",
+    "provenance"
+  ],
+  "title": "Paper",
+  "type": "object"
+}

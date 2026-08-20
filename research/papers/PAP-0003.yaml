@@ -1,0 +1,65 @@
+schema_version: "1.0.0"
+paper_id: "PAP-0003"
+title: "Deep learning with coherent nanophotonic circuits"
+authors:
+  - "Yichen Shen"
+  - "Nicholas C. Harris"
+  - "Scott Skirlo"
+  - "Mihika Prabhu"
+  - "Tom Baehr-Jones"
+  - "Michael Hochberg"
+  - "(et al.)"
+year: 2017
+venue:
+  name: "Nature Photonics"
+  type: JOURNAL
+identifiers:
+  doi: "10.1038/nphoton.2017.93"
+  arxiv: null
+  url: "https://www.nature.com/articles/nphoton.2017.93"
+
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+
+categories:
+  - photonic_computing
+  - optical_neural_networks
+  - silicon_photonics
+  - mzi_architectures
+
+hardware_studied:
+  - kind: PHOTONIC
+    description: "A programmable nanophotonic processor: a cascaded array of 56 programmable Mach-Zehnder interferometers in silicon, implementing an all-optical neural network layer."
+    fabrication: "silicon photonics"
+    scale: "single fabricated chip, experimental demonstration"
+
+methodology:
+  type: EXPERIMENTAL
+  measured_on_physical_hardware: true
+  simulator: null
+  workloads:
+    - "vowel-recognition neural network inference (per abstract-level knowledge)"
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+
+claims: []
+
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix:
+    - "This is the seminal MZI-mesh optical neural network paper and the closest existing real-hardware analogue to PHOENIX's own v0.6 photonic-simulation target. A FULL_READ pass, extracting the paper's own optical-loss and energy-per-MAC figures with their stated scope/excludes, would directly inform HYP records for the v0.6 MZI simulator (research/notes/) — recorded as a priority follow-up, not yet done."
+
+phoenix_relevance:
+  relevance: HIGH
+  informs_hypotheses: []
+  reproducible_by_phoenix: "NO"
+  follow_up_experiments: []
+
+provenance:
+  added_by: "Claude (automated literature-extraction pass)"
+  added_on: "2026-08-20"
+  read_status: ABSTRACT_ONLY
+  verified_by: null

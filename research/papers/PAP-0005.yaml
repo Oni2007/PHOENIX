@@ -1,0 +1,54 @@
+schema_version: "1.0.0"
+paper_id: "PAP-0005"
+title: "Roofline: An Insightful Visual Performance Model for Multicore Architectures"
+authors:
+  - "Samuel Williams"
+  - "Andrew Waterman"
+  - "David Patterson"
+year: 2009
+venue:
+  name: "Communications of the ACM, 52(4), pp. 65-76"
+  type: JOURNAL
+identifiers:
+  doi: "10.1145/1498765.1498785"
+  arxiv: null
+  url: "https://cacm.acm.org/research/roofline-an-insightful-visual-performance-model-for-multicore-architectures/"
+
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+
+categories:
+  - roofline_performance_modeling
+  - benchmarking_methodology
+
+hardware_studied: []
+
+methodology:
+  type: ANALYTICAL
+  measured_on_physical_hardware: false
+  simulator: null
+  workloads: []
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+
+claims: []
+
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix:
+    - "Foundational reference for PHOENIX's own roofline subsystem (TDD §33). Note initially cited with an incorrect DOI (10.1145/1498765.1498765, a transposed-digit variant) from one search source before being corrected against a second, independent source (ACM DL itself) to 10.1145/1498765.1498785 -- recorded here as a concrete instance of why every citation in this database is cross-checked rather than taken from a single source."
+
+phoenix_relevance:
+  relevance: HIGH
+  informs_hypotheses: []
+  reproducible_by_phoenix: "NO"
+  follow_up_experiments: []
+
+provenance:
+  added_by: "Claude (automated literature-extraction pass)"
+  added_on: "2026-08-20"
+  read_status: ABSTRACT_ONLY
+  verified_by: null
