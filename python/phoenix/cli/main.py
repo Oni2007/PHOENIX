@@ -140,5 +140,54 @@ def papers(
         )
 
 
+@app.command("roofline")
+def roofline(
+    hardware_record: Path,
+    precision: str,
+    sizes: str = "128,256,512,1024,2048,4096,8192",
+    dtype_bytes: float = 2.0,
+) -> None:
+    """ANALYTICAL roofline for a GEMM sweep against a hardware record's peak specs.
+
+    PURELY THEORETICAL. This command executes nothing and measures nothing —
+    it computes what a GEMM's arithmetic intensity and attainable throughput
+    WOULD be against a hardware record's own VENDOR_REPORTED peak figures. If
+    the record describes a device this project has never run on, that fact is
+    printed as a standing warning below, not left implicit.
+    """
+    from phoenix.analysis.roofline import gemm_roofline_point
+    from phoenix.discovery.hardware import load_device_record
+
+    record = load_device_record(hardware_record)
+    dims = [int(s.strip()) for s in sizes.split(",")]
+
+    typer.secho(
+        "═" * 78 + "\nPURELY THEORETICAL — no execution, no measurement.\n"
+        f"'{record.id}' has never been run on by PHOENIX (see the hardware record's own "
+        "header). Every number below is derived from VENDOR_REPORTED peak specs.\n" + "═" * 78,
+        fg=typer.colors.YELLOW,
+        bold=True,
+    )
+
+    rows = []
+    for n in dims:
+        metric = gemm_roofline_point(record, precision, n, n, n, dtype_bytes)
+        rows.append(metric.model_dump(mode="json"))
+        regime = metric.inputs["regime"]
+        ai = metric.inputs["arithmetic_intensity_flop_per_byte"]
+        gflops = metric.value / 1e9 if metric.value is not None else float("nan")
+        typer.echo(
+            f"M=N=K={n:<6d} AI={ai:8.2f} FLOP/B  {regime:13s}  attainable={gflops:10.1f} GFLOP/s"
+        )
+
+    if rows:
+        crossover = rows[0]["inputs"]["roofline_crossover_ai_flop_per_byte"]
+        typer.echo(
+            f"\nroofline crossover for {precision}: {crossover:.2f} FLOP/byte "
+            "(below this AI, memory-bound; above it, compute-bound)"
+        )
+    typer.echo(json.dumps(rows, indent=2, sort_keys=True))
+
+
 if __name__ == "__main__":
     app()

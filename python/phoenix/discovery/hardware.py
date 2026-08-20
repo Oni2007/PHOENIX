@@ -17,9 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from phoenix.provenance import Confidence, PeakComputeValue, ProvenanceValue
 
-DeviceClass = Literal[
-    "CPU", "GPU", "TPU", "NPU", "PHOTONIC", "NEUROMORPHIC", "OTHER_ACCELERATOR"
-]
+DeviceClass = Literal["CPU", "GPU", "TPU", "NPU", "PHOTONIC", "NEUROMORPHIC", "OTHER_ACCELERATOR"]
 
 
 class Identity(BaseModel):

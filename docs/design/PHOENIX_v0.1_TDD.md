@@ -1765,6 +1765,7 @@ Four distinct lines/points, **visually distinguished by provenance class**:
 | ADR-034 | GEMM correctness scales error by `(\|A\|·\|B\|)`, not `\|C\|`; `C` unchanged | Accepted | Dividing by `\|C\|` measures cancellation in the input data, not implementation error; found by EXP-001's first execution | Mixed-precision accumulate paths (EXP-006) |
 | ADR-035 | Working tree on a cloud-synced drive; build/venv outside it | Accepted | Immutability there is checksum-only: `chmod` is discarded by DrvFs (measured). `verify()` becomes mandatory, not advisory | A controlled measurement host exists |
 | ADR-036 | Vendor-BLAS cross-check gated on `blas_available()`, verified by CI, visibly skipped locally | Accepted | No root locally (no BLAS); GitHub Actions runner has root and installs it; a CI step fails the build if the tests skip when BLAS IS present | A controlled measurement host has root by default |
+| ADR-037 | Vendor hardware records for devices never run on are permitted, `PURELY THEORETICAL` in four independent places, sourced by cross-checked secondary transcription when NVIDIA's own PDFs cannot be parsed | Accepted | Explicit user request; roofline analysis (§33) is legitimate v0.1 scope without hardware, but only if never confusable with measurement | Real access to the device is acquired |
 
 ---
 
