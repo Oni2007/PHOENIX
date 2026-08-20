@@ -1,0 +1,58 @@
+schema_version: 1.0.0
+paper_id: PAP-0011
+title: Photonics for artificial intelligence and neuromorphic computing
+authors:
+- Bhavin J. Shastri
+- Alexander N. Tait
+- Thomas Ferreira de Lima
+- Wolfram H. P. Pernice
+- Hooman Bhaskaran
+- C. David Wright
+- Paul R. Prucnal
+year: 2021
+venue:
+  name: Nature Photonics
+  type: JOURNAL
+  tier_notes: null
+identifiers:
+  doi: 10.1038/s41566-020-00754-y
+  arxiv: null
+  url: null
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+categories:
+- photonic_computing
+- neuromorphic_computing
+hardware_studied:
+- kind: PHOTONIC
+  description: survey of photonic AI/neuromorphic hardware
+  fabrication: null
+  scale: null
+methodology:
+  type: SURVEY
+  measured_on_physical_hardware: false
+  simulator: null
+  workloads: []
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+claims: []
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix:
+  - Verified via a single WebSearch call this session; the call's own results included multiple corroborating
+    source links (e.g. dblp + arXiv + publisher page independently agreeing), which is weaker than the
+    deliberate dual-query cross-check used for PAP-0001..0006 and the H100 hardware record, but is genuine
+    multi-source corroboration, not recall from training memory.
+phoenix_relevance:
+  relevance: HIGH
+  informs_hypotheses: []
+  reproducible_by_phoenix: UNKNOWN
+  follow_up_experiments: []
+provenance:
+  added_by: Claude (batch literature-corpus growth pass)
+  added_on: '2026-08-20'
+  read_status: ABSTRACT_ONLY
+  verified_by: null

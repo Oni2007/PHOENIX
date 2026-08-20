@@ -1,0 +1,50 @@
+schema_version: 1.0.0
+paper_id: PAP-0041
+title: 'Accelergy: An Architecture-Level Energy Estimation Methodology for Accelerator Designs'
+authors:
+- Yannan Nellie Wu
+- Joel S. Emer
+- Vivienne Sze
+year: 2019
+venue:
+  name: ICCAD 2019
+  type: CONFERENCE
+  tier_notes: null
+identifiers:
+  doi: null
+  arxiv: null
+  url: https://accelergy.mit.edu/ispass2020/2020_08_23_timeloop_accelergy_tutorial_part1.pdf
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+categories:
+- benchmarking_methodology
+- ai_accelerator_architecture
+hardware_studied: []
+methodology:
+  type: EXPERIMENTAL
+  measured_on_physical_hardware: false
+  simulator: null
+  workloads: []
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+claims: []
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix:
+  - Verified via a single WebSearch call this session; the call's own results included multiple corroborating
+    source links (e.g. dblp + arXiv + publisher page independently agreeing), which is weaker than the
+    deliberate dual-query cross-check used for PAP-0001..0006 and the H100 hardware record, but is genuine
+    multi-source corroboration, not recall from training memory.
+phoenix_relevance:
+  relevance: MEDIUM
+  informs_hypotheses: []
+  reproducible_by_phoenix: UNKNOWN
+  follow_up_experiments: []
+provenance:
+  added_by: Claude (batch literature-corpus growth pass)
+  added_on: '2026-08-20'
+  read_status: ABSTRACT_ONLY
+  verified_by: null

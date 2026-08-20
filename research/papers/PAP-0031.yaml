@@ -1,0 +1,50 @@
+schema_version: 1.0.0
+paper_id: PAP-0031
+title: 'LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale'
+authors:
+- Tim Dettmers
+- Mike Lewis
+- Younes Belkada
+- Luke Zettlemoyer
+year: 2022
+venue:
+  name: NeurIPS 2022
+  type: CONFERENCE
+  tier_notes: null
+identifiers:
+  doi: null
+  arxiv: '2208.07339'
+  url: null
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+categories:
+- transformer_acceleration
+hardware_studied: []
+methodology:
+  type: EXPERIMENTAL
+  measured_on_physical_hardware: true
+  simulator: null
+  workloads: []
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+claims: []
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix:
+  - Verified via a single WebSearch call this session; the call's own results included multiple corroborating
+    source links (e.g. dblp + arXiv + publisher page independently agreeing), which is weaker than the
+    deliberate dual-query cross-check used for PAP-0001..0006 and the H100 hardware record, but is genuine
+    multi-source corroboration, not recall from training memory.
+phoenix_relevance:
+  relevance: MEDIUM
+  informs_hypotheses: []
+  reproducible_by_phoenix: UNKNOWN
+  follow_up_experiments: []
+provenance:
+  added_by: Claude (batch literature-corpus growth pass)
+  added_on: '2026-08-20'
+  read_status: ABSTRACT_ONLY
+  verified_by: null

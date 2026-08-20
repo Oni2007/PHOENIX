@@ -1,0 +1,64 @@
+schema_version: 1.0.0
+paper_id: PAP-0026
+title: 'Simba: Scaling Deep-Learning Inference with Multi-Chip-Module-Based Architecture'
+authors:
+- Yakun Sophia Shao
+- Jason Clemons
+- Rangharajan Venkatesan
+- Brian Zimmer
+- Matthew Fojtik
+- Nan Jiang
+- Ben Keller
+- Alicia Klinefelter
+- Nathaniel Pinckney
+- Priyanka Raina
+- Stephen G. Tell
+- Yanqing Zhang
+- William J. Dally
+- Joel S. Emer
+- C. Thomas Gray
+- Stephen W. Keckler
+- Brucek Khailany
+year: 2019
+venue:
+  name: MICRO 2019
+  type: CONFERENCE
+  tier_notes: null
+identifiers:
+  doi: 10.1145/3352460.3358302
+  arxiv: null
+  url: null
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+categories:
+- ai_accelerator_architecture
+- chiplets
+hardware_studied: []
+methodology:
+  type: EXPERIMENTAL
+  measured_on_physical_hardware: true
+  simulator: null
+  workloads: []
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+claims: []
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix:
+  - Verified via a single WebSearch call this session; the call's own results included multiple corroborating
+    source links (e.g. dblp + arXiv + publisher page independently agreeing), which is weaker than the
+    deliberate dual-query cross-check used for PAP-0001..0006 and the H100 hardware record, but is genuine
+    multi-source corroboration, not recall from training memory.
+phoenix_relevance:
+  relevance: MEDIUM
+  informs_hypotheses: []
+  reproducible_by_phoenix: UNKNOWN
+  follow_up_experiments: []
+provenance:
+  added_by: Claude (batch literature-corpus growth pass)
+  added_on: '2026-08-20'
+  read_status: ABSTRACT_ONLY
+  verified_by: null
