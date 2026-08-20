@@ -1,0 +1,73 @@
+schema_version: "1.0.0"
+paper_id: "PAP-0002"
+title: "Attention Is All You Need"
+authors:
+  - "Ashish Vaswani"
+  - "Noam Shazeer"
+  - "Niki Parmar"
+  - "Jakob Uszkoreit"
+  - "Llion Jones"
+  - "Aidan N. Gomez"
+  - "Lukasz Kaiser"
+  - "Illia Polosukhin"
+year: 2017
+venue:
+  name: "NeurIPS 2017 (Advances in Neural Information Processing Systems 30)"
+  type: CONFERENCE
+identifiers:
+  doi: null
+  arxiv: "1706.03762"
+  url: "https://proceedings.neurips.cc/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html"
+
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+
+categories:
+  - transformer_acceleration
+  - ai_accelerator_architecture
+
+hardware_studied:
+  - kind: GPU
+    description: "Trained on 8x NVIDIA P100 GPUs (verified via search, not from abstract text directly)."
+    fabrication: null
+    scale: "single 8-GPU node"
+
+methodology:
+  type: EXPERIMENTAL
+  measured_on_physical_hardware: true
+  simulator: null
+  workloads:
+    - "machine translation (WMT 2014 English-German, English-French)"
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+
+claims:
+  - claim_id: "PAP-0002-C1"
+    statement: "The base Transformer model was trained for 3.5 days on 8 NVIDIA P100 GPUs."
+    quantity: {name: "training wall-clock time", value: 3.5, unit: "days"}
+    evidence_class: MEASURED
+    scope: "base model configuration, 8x P100 GPU node, WMT translation task"
+    excludes:
+      - "the larger/'big' model variant, which the paper reports trained for longer"
+      - "per-GPU power or energy figures -- not stated at this review depth"
+    uncertainty_reported: false
+    confidence_in_claim: MEDIUM
+
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix: []
+
+phoenix_relevance:
+  relevance: MEDIUM
+  informs_hypotheses: []
+  reproducible_by_phoenix: "NO"
+  follow_up_experiments: []
+
+provenance:
+  added_by: "Claude (automated literature-extraction pass)"
+  added_on: "2026-08-20"
+  read_status: SKIMMED
+  verified_by: null

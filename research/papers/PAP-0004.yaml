@@ -1,0 +1,61 @@
+schema_version: "1.0.0"
+paper_id: "PAP-0004"
+title: "Loihi: A Neuromorphic Manycore Processor with On-Chip Learning"
+authors:
+  - "Mike Davies"
+  - "Narayan Srinivasa"
+  - "Tsung-Han Lin"
+  - "Gautham N. Chinya"
+  - "Yongqiang Cao"
+  - "(et al., Intel)"
+year: 2018
+venue:
+  name: "IEEE Micro, 38(1), pp. 82-99"
+  type: JOURNAL
+identifiers:
+  doi: "10.1109/MM.2018.112130359"
+  arxiv: null
+  url: "https://www.semanticscholar.org/paper/Loihi:-A-Neuromorphic-Manycore-Processor-with-Davies-Srinivasa/ccc560f932e36b8561a847e02fcf20522bc71c5f"
+
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+
+categories:
+  - neuromorphic_computing
+  - snns
+  - ai_accelerator_architecture
+
+hardware_studied:
+  - kind: NEUROMORPHIC
+    description: "Loihi: a 60 mm^2 chip fabricated in Intel's 14nm process, implementing spiking neural network computation with hierarchical connectivity, dendritic compartments, synaptic delays, and programmable on-chip synaptic learning rules."
+    fabrication: "Intel 14nm"
+    scale: "single fabricated chip"
+
+methodology:
+  type: EXPERIMENTAL
+  measured_on_physical_hardware: true
+  simulator: null
+  workloads: []
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+
+claims: []
+
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix: []
+
+phoenix_relevance:
+  relevance: HIGH
+  informs_hypotheses: []
+  reproducible_by_phoenix: "NO"
+  follow_up_experiments: []
+
+provenance:
+  added_by: "Claude (automated literature-extraction pass)"
+  added_on: "2026-08-20"
+  read_status: ABSTRACT_ONLY
+  verified_by: null

@@ -1,0 +1,54 @@
+schema_version: "1.0.0"
+paper_id: "PAP-0006"
+title: "Efficient Processing of Deep Neural Networks: A Tutorial and Survey"
+authors:
+  - "Vivienne Sze"
+  - "Yu-Hsin Chen"
+  - "Tien-Ju Yang"
+  - "Joel S. Emer"
+year: 2017
+venue:
+  name: "Proceedings of the IEEE, 105(12), pp. 2295-2329"
+  type: JOURNAL
+identifiers:
+  doi: "10.1109/JPROC.2017.2761740"
+  arxiv: "1703.09039"
+  url: "https://arxiv.org/abs/1703.09039"
+
+artifacts:
+  code: null
+  data: null
+  reproducible: UNKNOWN
+
+categories:
+  - ai_accelerator_architecture
+  - benchmarking_methodology
+
+hardware_studied: []
+
+methodology:
+  type: SURVEY
+  measured_on_physical_hardware: false
+  simulator: null
+  workloads: []
+  precision: null
+  baseline_compared_against: null
+  baseline_fairness_assessment: null
+
+claims: []
+
+limitations:
+  stated_by_authors: []
+  identified_by_phoenix: []
+
+phoenix_relevance:
+  relevance: MEDIUM
+  informs_hypotheses: []
+  reproducible_by_phoenix: "NO"
+  follow_up_experiments: []
+
+provenance:
+  added_by: "Claude (automated literature-extraction pass)"
+  added_on: "2026-08-20"
+  read_status: ABSTRACT_ONLY
+  verified_by: null

@@ -115,5 +115,30 @@ def run_info(run_dir: Path) -> None:
     typer.echo(json.dumps(analyse_run(run_dir), indent=2, sort_keys=True, default=str))
 
 
+@app.command("papers")
+def papers(
+    papers_dir: Path = Path("research/papers"),
+    csv_out: Path = Path("research/papers.csv"),
+) -> None:
+    """Validate the literature corpus and regenerate research/papers.csv.
+
+    The YAML files are the source of truth; the CSV is a generated export.
+    Editing the CSV directly is a no-op that gets overwritten.
+    """
+    from phoenix.literature.store import corpus_summary, export_csv, load_all
+
+    root = _repo_root()
+    corpus = load_all(root / papers_dir)
+    export_csv(corpus, root / csv_out)
+    summary = corpus_summary(corpus)
+    typer.echo(json.dumps(summary, indent=2, sort_keys=True))
+    if summary["abstract_only"] > 0:
+        typer.secho(
+            f"{summary['abstract_only']} paper(s) at ABSTRACT_ONLY — never cite these in "
+            "PHOENIX output (TDD §24)",
+            fg=typer.colors.YELLOW,
+        )
+
+
 if __name__ == "__main__":
     app()
